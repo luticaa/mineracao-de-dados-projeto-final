@@ -1,0 +1,48 @@
+{
+  "dataset": {
+    "repository": "McAuley-Lab/Amazon-Reviews-2023",
+    "category": "Books",
+    "official_url": "https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023/resolve/main/raw/review_categories/Books.jsonl",
+    "resolved_url": "https://us.aws.cdn.hf.co/xet-bridge-us/65af4645d0a5cc99d51642da/a7cfa3b5738ec92b6ec602f3cdaf93236cdf583ed3b62c5e79b5f21304ad5cdf?xip=MkeUbGYzBp0&user_id=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27Books.jsonl%3B+filename%3D%22Books.jsonl%22%3B&X-Xet-Cas-Uid=public&Expires=1794281024&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjVhZjQ2NDVkMGE1Y2M5OWQ1MTY0MmRhL2E3Y2ZhM2I1NzM4ZWM5MmI2ZWM2MDJmM2NkYWY5MzIzNmNkZjU4M2VkM2I2MmM1ZTc5YjVmMjEzMDRhZDVjZGZcXD94aXA9TWtlVWJHWXpCcDAmdXNlcl9pZD1wdWJsaWMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN0Jvb2tzLmpzb25sJTNCK2ZpbGVuYW1lJTNEJTIyQm9va3MuanNvbmwlMjIlM0ImWC1YZXQtQ2FzLVVpZD1wdWJsaWMiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc5NDI4MTAyNH19fV19&Signature=MEUCIGWZFqiqF-i5iqqaj4YgoYU1RiQJwKxyYICqzkb4X9oCAiEAvwgcRG7PS1f8jAqK8aPquUVMOi6yCozOGOQc%7EPCOhw8_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
+    "total_population_estimate": 29500000
+  },
+  "sampling_protocol": {
+    "method": "Streaming Reservoir Sampling (Algorithm R) - Mode: bounded_10pct",
+    "unit_of_observation": "Review (avaliação individual)",
+    "random_seed": 20261109,
+    "requested_sample_size": 20000,
+    "achieved_sample_size": 20000,
+    "lines_scanned": 2950000,
+    "valid_records_scanned": 2950000,
+    "corrupted_records": 0,
+    "corrupted_rate": 0.0,
+    "network_bytes_transferred": 2021396336,
+    "duration_seconds": 86.20078301429749,
+    "timestamp_utc": "2026-11-10T02:31:33.708185+00:00"
+  },
+  "methodological_limitations": {
+    "representativeness_scope": "Uniforme exclusivamente dentro das linhas percorridas no stream. No modo 'bounded_10pct', representa apenas o trecho inicial da base (~10%), possuindo viés de ordem/tempo e NÃO representando a totalidade de Books.",
+    "recommendation": "Para inferência estatística irrestrita sobre toda a categoria Books, execute em modo 'full_population'."
+  },
+  "artifact_integrity": {
+    "filename": "books_reviews_sample_20k_seed_20261109.csv",
+    "file_size_bytes": 10871734,
+    "sha256": "5089ff682a56d42f92f4d3c70f84a92bbbbcfb84833145a3c018bce70fa596ea",
+    "encoding": "utf-8",
+    "columns": [
+      "rating",
+      "title",
+      "text",
+      "parent_asin",
+      "user_id",
+      "timestamp",
+      "verified_purchase",
+      "helpful_vote"
+    ]
+  },
+  "environment": {
+    "python_version": "3.13.9",
+    "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+    "pandas_version": "2.3.3"
+  }
+}

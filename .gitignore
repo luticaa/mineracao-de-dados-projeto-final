@@ -1,0 +1,22 @@
+# Ambientes virtuais
+venv/
+.env/
+env/
+
+# Caches do Python e Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Dados brutos massivos (não versionar arquivos de 20 GB)
+data/raw/*
+!data/raw/.gitkeep
+
+# Arquivos temporários de download
+*.part
+*.tmp
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
