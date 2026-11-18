@@ -3,7 +3,7 @@
     "repository": "McAuley-Lab/Amazon-Reviews-2023",
     "category": "Books",
     "official_url": "https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023/resolve/main/raw/review_categories/Books.jsonl",
-    "resolved_url": "https://us.aws.cdn.hf.co/xet-bridge-us/65af4645d0a5cc99d51642da/a7cfa3b5738ec92b6ec602f3cdaf93236cdf583ed3b62c5e79b5f21304ad5cdf?xip=MkeUbGYzBp0&user_id=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27Books.jsonl%3B+filename%3D%22Books.jsonl%22%3B&X-Xet-Cas-Uid=public&Expires=1794281024&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjVhZjQ2NDVkMGE1Y2M5OWQ1MTY0MmRhL2E3Y2ZhM2I1NzM4ZWM5MmI2ZWM2MDJmM2NkYWY5MzIzNmNkZjU4M2VkM2I2MmM1ZTc5YjVmMjEzMDRhZDVjZGZcXD94aXA9TWtlVWJHWXpCcDAmdXNlcl9pZD1wdWJsaWMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN0Jvb2tzLmpzb25sJTNCK2ZpbGVuYW1lJTNEJTIyQm9va3MuanNvbmwlMjIlM0ImWC1YZXQtQ2FzLVVpZD1wdWJsaWMiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc5NDI4MTAyNH19fV19&Signature=MEUCIGWZFqiqF-i5iqqaj4YgoYU1RiQJwKxyYICqzkb4X9oCAiEAvwgcRG7PS1f8jAqK8aPquUVMOi6yCozOGOQc%7EPCOhw8_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
+    "resolved_url": "https://us.aws.cdn.hf.co/xet-bridge-us/65af4645d0a5cc99d51642da/a7cfa3b5738ec92b6ec602f3cdaf93236cdf583ed3b62c5e79b5f21304ad5cdf?X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27Books.jsonl%3B+filename%3D%22Books.jsonl%22%3B&user_id=public&xip=qbhFN8nuIr8&Expires=1794972462&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjVhZjQ2NDVkMGE1Y2M5OWQ1MTY0MmRhL2E3Y2ZhM2I1NzM4ZWM5MmI2ZWM2MDJmM2NkYWY5MzIzNmNkZjU4M2VkM2I2MmM1ZTc5YjVmMjEzMDRhZDVjZGZcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3Qm9va3MuanNvbmwlM0IrZmlsZW5hbWUlM0QlMjJCb29rcy5qc29ubCUyMiUzQiZ1c2VyX2lkPXB1YmxpYyZ4aXA9cWJoRk44bnVJcjgiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc5NDk3MjQ2Mn19fV19&Signature=MEUCIQD5KpyoG3JaqEfwQE2t5IkLN-rGTfGEUgmLc-z4Q-1WggIgVQ8aOyCUKrAytKOuSmGwvKopaVpRNOZuB68M3aOwblc_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
     "total_population_estimate": 29500000
   },
   "sampling_protocol": {
@@ -17,8 +17,8 @@
     "corrupted_records": 0,
     "corrupted_rate": 0.0,
     "network_bytes_transferred": 2021396336,
-    "duration_seconds": 86.20078301429749,
-    "timestamp_utc": "2026-11-10T02:31:33.708185+00:00"
+    "duration_seconds": 78.90860986709595,
+    "timestamp_utc": "2026-11-18T02:29:01.786637+00:00"
   },
   "methodological_limitations": {
     "representativeness_scope": "Uniforme exclusivamente dentro das linhas percorridas no stream. No modo 'bounded_10pct', representa apenas o trecho inicial da base (~10%), possuindo viés de ordem/tempo e NÃO representando a totalidade de Books.",
