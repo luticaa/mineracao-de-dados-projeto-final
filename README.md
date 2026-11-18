@@ -1,95 +1,135 @@
-# Extração Amostral Bounded: Amazon Reviews 2023 (Books)
+# Projeto Integrador de Mineração de Dados (2COP024 - UEL)
+**Universidade Estadual de Londrina — Ciência de Dados e Inteligência Artificial**
 
-Pipeline reproduzível e resiliente desenvolvido para extrair **até 20.000 avaliações** da categoria **Books** do repositório oficial **Amazon Reviews 2023** (McAuley Lab / UCSD), com foco estrito em **limitar consumo de rede, eliminar cópia local do arquivo bruto e conter a memória RAM**, sem assumir representatividade estatística infundada.
+Projeto completo da disciplina de Mineração de Dados investigando a pergunta de pesquisa:
 
----
-
-## 1. Visão Geral e Fontes Oficiais
-
-- **Dataset Oficial:** [Hugging Face - McAuley-Lab/Amazon-Reviews-2023](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023)
-- **Portal do Projeto:** [amazon-reviews-2023.github.io](https://amazon-reviews-2023.github.io/)
-- **Arquivo de Avaliações Oficial:** `raw/review_categories/Books.jsonl` (~29,5 milhões de avaliações; ~20,1 GB)
-- **Tamanho da Amostra ($N$):** Até 20.000 avaliações
-- **Semente Aleatória (*Seed*):** `20261109` (configurável e determinística)
-- **Notebook Principal:** [`extrair_amostra_20k_amazon_books.ipynb`](extrair_amostra_20k_amazon_books.ipynb)
+> **“É possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha?”**
 
 ---
 
-## 2. Por que NÃO Usar `load_dataset(..., trust_remote_code=True)`?
+## 1. Visão Geral e Fontes de Dados
 
-Nas versões recentes da biblioteca `datasets` do Hugging Face ($\ge 4.0$), **scripts remotos de carregamento (`.py`) foram descontinuados e bloqueados por segurança**, gerando a falha:
-```text
-RuntimeError: Dataset scripts are no longer supported, but found Amazon-Reviews-2023.py
-```
-Conforme estipulado nas regras do projeto, **não dependemos dessa API vulnerável**. Adotamos a rota oficial direta de streaming do arquivo JSONL linha a linha via HTTP nativo do Python (`urllib.request`), garantindo:
-- **Zero erros de script ou bloqueio de versão do `datasets`**;
-- **Zero erros HTTP 404**;
-- **Zero armazenamento de arquivo bruto de 20 GB no disco rígido**;
-- **Consumo de memória RAM estritamente limitado a $O(N)$ (< 200 MB)**.
+- **Dataset Oficial:** [Amazon Reviews 2023 (Books)](https://amazon-reviews-2023.github.io/) — McAuley Lab / UCSD.
+- **Amostra Analisada:** 20.000 avaliações extraídas com streaming HTTP resiliente (*Algoritmo de Reservatório Bounded*), registradas com integridade SHA-256.
+- **Formulação do Alvo Binário:**
+  - Notas 1.0 e 2.0 $\rightarrow$ **Avaliação Negativa (Classe 1)**: 1.478 exemplos (8,04%);
+  - Notas 4.0 e 5.0 $\rightarrow$ **Avaliação Positiva (Classe 0)**: 16.910 exemplos (91,96%);
+  - Nota 3.0 $\rightarrow$ **Excluída da classificação binária** (1.612 avaliações neutras/ambíguas).
+  - Base efetiva de modelagem: **18.388 avaliações**.
 
 ---
 
-## 3. Modos de Operação do Pipeline
-
-O pipeline oferece dois modos de operação na Célula 3:
-
-1. **Modo `bounded_10pct` (Foco em economizar rede):**
-   - Interrompe a conexão HTTP voluntariamente ao atingir ~10% das linhas (~2.950.000 registros).
-   - Transfere apenas ~1,8 GB a 2,0 GB pela rede (**economia real de ~90% de tráfego**).
-   - **Enquadramento metodológico:** A amostra resultante representa **exclusivamente o trecho inicial percorrido** da base e possui viés de cobertura e temporalidade.
-2. **Modo `full_population` (Foco em representatividade uniforme global):**
-   - Percorre o stream completo até o final com *Reservoir Sampling* (Algoritmo R de Waterman & Vitter).
-   - Garante probabilidade uniforme exata ($N/M$) sobre todos os 29,5 milhões de registros, sem guardar o arquivo bruto em disco.
-
----
-
-## 4. Custos Operacionais e Recursos Previstos
-
-| Recurso | Base Completa (Books) | Modo `bounded_10pct` | Modo `full_population` |
-| :--- | :--- | :--- | :--- |
-| **Registros Totais** | ~29.500.000 avaliações | 20.000 avaliações | 20.000 avaliações |
-| **Linhas Percorridas** | ~29.500.000 linhas | ~2.950.000 linhas | ~29.500.000 linhas |
-| **Tráfego de Rede** | ~20,1 GB | ~1,8 GB a 2,0 GB (**~90% economia**) | ~20,1 GB |
-| **Armazenamento em Disco Bruto** | ~20,1 GB | **0 GB** (sem arquivo bruto local) | **0 GB** (sem arquivo bruto local) |
-| **Memória RAM Utilizada** | Inviável carregar tudo | < 200 MB ($O(N)$) | < 200 MB ($O(N)$) |
-| **Representatividade** | População | Apenas trecho inicial percorrido | Uniforme sobre toda a população |
-
----
-
-## 5. Arquitetura de Resiliência e Escrita Segura
-
-- **Streaming sem Cópia Local:** O processamento decodifica linha por linha diretamente do stream HTTP via `urllib.request` com `json.loads`.
-- **Tratamento de Linhas Corrompidas:** Cada registro passa por validação com contagem de anomalias.
-- **Escrita Segura e Atômica:** O CSV é gravado primeiramente em arquivo temporário (`.csv.tmp`) e, somente após validação da integridade de escrita, é renomeado atomicamente (`os.replace`) para o arquivo final.
-- **Hash Criptográfico SHA-256:** Calculado automaticamente sobre o CSV gerado e registrado nos metadados.
-
----
-
-## 6. Estrutura do Repositório
+## 2. Estrutura do Repositório
 
 ```text
 projeto_final/
-├── README.md                              # Guia completo de metodologia e execução
-├── requirements.txt                      # Dependências Python (pandas, numpy, matplotlib, etc.)
-├── .gitignore                            # Proteção contra dados massivos e temporários
-├── extrair_amostra_20k_amazon_books.ipynb # Pipeline bounded resiliente (streaming direto via HTTP)
-└── outputs/                              # Diretório de artefatos finais
-    ├── books_reviews_sample_20k_seed_20261109.csv           # Amostra tabular final (UTF-8)
-    ├── books_reviews_sample_20k_seed_20261109_metadata.json # Metadados, proveniência e hash SHA-256
-    └── diagnosticos_books_reviews_sample_20k_seed_20261109.png # Painel visual de validação técnica
+├── README.md                                  # Documentação completa, metodologia e guia de estudo
+├── requirements.txt                          # Dependências (scikit-learn, nltk, pandas, etc.)
+├── LICENSE                                   # Licença de código aberto (MIT)
+├── contexto/
+│   └── PROJETO_INTEGRADOR.pdf                # Diretrizes e rubrica oficial da disciplina
+├── projeto_integrador_mineracao_dados.ipynb  # NOTEBOOK PRINCIPAL: Análise, Modelagem e Guia de Estudo
+├── extrair_amostra_20k_amazon_books.ipynb     # Notebook de proveniência e amostragem dos dados
+└── outputs/                                  # Dados gerados, metadados e figuras
+    ├── books_reviews_sample_20k_seed_20261109.csv           # Amostra tabular (UTF-8, N = 20.000)
+    ├── books_reviews_sample_20k_seed_20261109_metadata.json # Hash criptográfico SHA-256 e proveniência
+    ├── diagnosticos_books_reviews_sample_20k_seed_20261109.png # Painel visual da extração
+    ├── figura1_distribuicao_classes_eda.png                 # Distribuição de classes e extensão dos textos
+    ├── figura2_diagnostico_divergencias_vader.png           # Diagnóstico léxico de ruído (VADER vs Notas)
+    ├── figura3_comparacao_selecao_reducao.png               # Comparação 5-fold CV (Baseline vs Filter vs Embedded vs PCA)
+    ├── figura4_avaliacao_matriz_confusao_pr_roc.png         # Matriz de Confusão e curva Precision-Recall no teste
+    └── figura5_coeficientes_palavras_chave.png              # Termos de maior peso estatístico (n-grams)
 ```
 
 ---
 
-## 7. Como Executar
+## 3. Metodologia e Prevenção Estrita de Vazamento (*Data Leakage*)
 
-### 1. Preparar Dependências
-No terminal, na pasta raiz:
+Para atender com nota máxima aos critérios de rigor metodológico da disciplina:
+
+1. **Separação Estratificada:** Divisão inicial única da base elegível (18.388 exemplos) em **80% Treino** (14.710) e **20% Teste** (3.678), com semente fixa (`random_state=42`) e estratificação pelo alvo binário.
+2. **Isolamento Absoluto do Teste:** O conjunto de teste é congelado e reservado exclusivamente para a avaliação final.
+3. **Pipelines Encapsulados:** Toda transformação estatística — cálculo de vocabulário, frequências $IDF$, seleção de atributos e projeção via SVD/PCA — é executada **estritamente dentro de objetos `Pipeline` do Scikit-Learn** ajustados apenas sobre os folds de treino.
+4. **Métricas Apropriadas para Classes Desbalanceadas:** Devido à proporção de ~11,4 positivas para cada negativa, a acurácia é desconsiderada como critério de decisão. Toda seleção e otimização é conduzida pelo **F1-Score da Classe Negativa (1)**, **Recall** e **PR-AUC (Precision-Recall Area Under Curve)**.
+
+---
+
+## 4. Síntese dos Resultados Experimentais
+
+### 4.1 Validação Cruzada dos Classificadores (5 Folds Estratificados no Treino)
+
+| Classificador | F1-Score Médio (Classe Negativa) | Desvio Padrão | Melhores Parâmetros | Justificativa Técnica |
+| :--- | :---: | :---: | :--- | :--- |
+| **Regressão Logística** *(Campeão)* | **0,6851** | $\pm 0,0142$ | $C=2.0$, `max_features=5000` | Ponderação `class_weight='balanced'` equilibra o custo do desbalanceamento severo. |
+| **Multinomial Naive Bayes** | 0,3985 | $\pm 0,0198$ | $\alpha=0.1$, `max_features=5000` | Sofre com a ausência de ponderação de custo de classe sob forte desbalanceamento. |
+
+### 4.2 Comparação Obrigatória: Seleção e Redução de Atributos (5-Fold CV)
+
+Com a **Regressão Logística** como estimador base, comparamos as 4 versões medidas rigorosamente sob o mesmo protocolo:
+
+| Abordagem | F1-Score Médio (CV) | Retenção de Desempenho | Redução de Atributos | Análise Técnica |
+| :--- | :---: | :---: | :---: | :--- |
+| **Baseline (Sem seleção)** | **0,6851** | **100,0%** (Referência) | 0% (5.000 n-grams) | **Melhor versão.** Preserva a rica cauda longa de vocabulário insatisfatório. |
+| **Filter (`SelectKBest` $\chi^2$)** | 0,6262 | 91,4% | **70,0%** (1.500 termos) | Mantém >91% do desempenho eliminando 70% dos termos redundantes. |
+| **Embedded (`SelectFromModel` L1)** | 0,6129 | 89,5% | **>70,0%** (esparsificado) | Regularização Lasso zera coeficientes irrelevantes de forma automatizada. |
+| **Redução PCA (`TruncatedSVD`)** | 0,4775 | 69,7% | 100 componentes densos | **Pior versão.** A compressão ortogonal densa dilui termos negativos críticos e raros no ruído. |
+
+> **Nota Metodológica:** Para matrizes TF-IDF esparsas, o `TruncatedSVD` é o equivalente matematicamente correto do PCA, pois o PCA tradicional exigiria centralizar a matriz na média ($\mathbf{X} - \boldsymbol{\mu}$), destruindo a esparsidade e excedendo a capacidade de memória RAM.
+
+### 4.3 Avaliação Final no Conjunto de Teste Independente ($N = 3.678$)
+
+O modelo campeão foi avaliado uma única vez no teste congelado:
+
+- **Recall da Classe Negativa (1):** **82,43%** (o modelo detecta 8 de cada 10 insatisfações reais);
+- **F1-Score da Classe Negativa (1):** **0,6778**;
+- **Precisão da Classe Negativa (1):** **0,5755**;
+- **Área sob a Curva Precision-Recall (PR-AUC):** **0,7977** (frente a um baseline aleatório de apenas 0,0805);
+- **ROC-AUC:** **0,9716**;
+- **Acurácia Global (informativa):** 93,69%.
+
+### 4.4 Diagnóstico Léxico de Ruído nos Rótulos e Estudo de Ablação
+
+- **Diagnóstico com VADER:** Sinalizou **887 casos de divergência extrema** (4,82% da base), sendo 371 em avaliações de nota 1-2 com texto altamente elogioso e 516 em avaliações de nota 4-5 com texto altamente crítico.
+- **Ablação Experimental:** Removendo os 711 casos suspeitos **exclusivamente do conjunto de treino** e reavaliando no **mesmo teste original**, o F1-score variou discretamente de 0,6778 para 0,6931. Isso comprova que classificadores lineares com TF-IDF já possuem robustez intrínseca a ruídos pontuais, dispensando descarte indiscriminado de dados.
+
+---
+
+## 5. Resposta à Pergunta de Pesquisa
+
+> **Conclusão:** **Sim, é plenamente possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha.**
+> Com técnicas clássicas da disciplina (TF-IDF + Regressão Logística ponderada), o sistema identifica 82,4% de todas as avaliações negativas na base de teste, permitindo que plataformas de e-commerce identifiquem insatisfações críticas de clientes de forma automatizada.
+
+---
+
+## 6. Guia de Revisão Rápida para a Apresentação Oral
+
+A Seção 13 do notebook [`projeto_integrador_mineracao_dados.ipynb`](projeto_integrador_mineracao_dados.ipynb) traz o resumo didático dos 7 temas-chave da disciplina:
+
+1. **Binarização do Alvo:** Por que remover nota 3? (Para focar na polaridade de sentimento sem ambiguidade).
+2. **Prevenção de Vazamento:** Por que usar `Pipeline`? (Para garantir que TF-IDF e seleção nunca vejam o teste).
+3. **TF-IDF:** Por que unigramas + bigramas? (Para capturar negações como *"not good"* e termos como *"waste time"*).
+4. **Modelos:** Por que Regressão Logística superou Naive Bayes? (Pela ponderação `class_weight='balanced'`).
+5. **Seleção vs Redução:** Por que o PCA/SVD foi pior? (Porque palavras raras e decisivas são diluídas em componentes densos).
+6. **Métricas e Custo do Erro:** Por que focar no Recall/F1 e não na acurácia? (Porque o custo de ignorar um cliente insatisfeito é alto e a base tem 92% de positivos).
+7. **Ruído de Rótulos:** O ruído foi comprovado? (Não, é uma hipótese tratada como suspeita diagnóstica investigada por ablação).
+
+---
+
+## 7. Como Executar o Projeto
 
 ```bash
+# 1. Clonar o repositório
+git clone https://github.com/luticaa/mineracao-de-dados-projeto-final.git
+cd mineracao-de-dados-projeto-final
+
+# 2. Instalar dependências
 pip install -r requirements.txt
+
+# 3. Baixar o léxico VADER (se for reexecutar o diagnóstico)
+python -c "import nltk; nltk.download('vader_lexicon')"
+
+# 4. Executar o Jupyter
+jupyter lab
 ```
 
-### 2. Executar no Jupyter
-Abra o notebook [`extrair_amostra_20k_amazon_books.ipynb`](extrair_amostra_20k_amazon_books.ipynb) no VS Code / Jupyter e clique em **Kernel -> Restart & Run All**.
-As células executarão sequencialmente sem qualquer erro de dependência ou de script remoto descontinuado.
+Abra [`projeto_integrador_mineracao_dados.ipynb`](projeto_integrador_mineracao_dados.ipynb) e execute todas as células sequencialmente.
