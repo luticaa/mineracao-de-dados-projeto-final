@@ -1,5 +1,5 @@
 # Projeto Integrador de Mineração de Dados (2COP024 - UEL)
-**Universidade Estadual de Londrina — Ciência de Dados e Inteligência Artificial**
+**Universidade Estadual de Londrina — Ciência da Computação / Ciência de Dados e IA**
 
 Projeto completo da disciplina de Mineração de Dados investigando a pergunta de pesquisa:
 
@@ -36,9 +36,9 @@ projeto_final/
     ├── diagnosticos_books_reviews_sample_20k_seed_20261109.png # Painel visual da extração
     ├── figura1_distribuicao_classes_eda.png                 # Distribuição de classes e extensão dos textos
     ├── figura2_diagnostico_divergencias_vader.png           # Diagnóstico léxico de ruído (VADER vs Notas)
-    ├── figura3_comparacao_selecao_reducao.png               # Comparação 5-fold CV (Baseline vs Filter vs Embedded vs PCA)
+    ├── figura3_comparacao_selecao_reducao.png               # Comparação 5-fold CV com Linear SVM
     ├── figura4_avaliacao_matriz_confusao_pr_roc.png         # Matriz de Confusão e curva Precision-Recall no teste
-    └── figura5_coeficientes_palavras_chave.png              # Termos de maior peso estatístico (n-grams)
+    └── figura5_coeficientes_palavras_chave.png              # Termos de maior peso estatístico (Linear SVM)
 ```
 
 ---
@@ -56,48 +56,50 @@ Para atender com nota máxima aos critérios de rigor metodológico da disciplin
 
 ## 4. Síntese dos Resultados Experimentais
 
-### 4.1 Validação Cruzada dos Classificadores (5 Folds Estratificados no Treino)
+### 4.1 Validação Cruzada dos Classificadores da Disciplina (5 Folds Estratificados no Treino)
+
+Conforme o regulamento da disciplina (*"pelo menos dois classificadores da disciplina (árvore, floresta, boosting, SVM, logística...)"*), comparamos dois modelos citados nominalmente:
 
 | Classificador | F1-Score Médio (Classe Negativa) | Desvio Padrão | Melhores Parâmetros | Justificativa Técnica |
 | :--- | :---: | :---: | :--- | :--- |
-| **Regressão Logística** *(Campeão)* | **0,6851** | $\pm 0,0142$ | $C=2.0$, `max_features=5000` | Ponderação `class_weight='balanced'` equilibra o custo do desbalanceamento severo. |
-| **Multinomial Naive Bayes** | 0,3985 | $\pm 0,0198$ | $\alpha=0.1$, `max_features=5000` | Sofre com a ausência de ponderação de custo de classe sob forte desbalanceamento. |
+| **Linear SVM (`LinearSVC`)** *(Campeão)* | **0,6874** | $\pm 0,0189$ | $C=0.5$, `class_weight='balanced'` | Margem máxima com *hinge loss*; ótimo comportamento em matrizes esparsas de texto em alta dimensão. |
+| **Regressão Logística** | 0,6851 | $\pm 0,0142$ | $C=2.0$, `class_weight='balanced'` | Minimização de *log-loss* probabilística com coeficientes diretamente interpretáveis. |
 
 ### 4.2 Comparação Obrigatória: Seleção e Redução de Atributos (5-Fold CV)
 
-Com a **Regressão Logística** como estimador base, comparamos as 4 versões medidas rigorosamente sob o mesmo protocolo:
+Com o **Linear SVM** como estimador campeão, comparamos as 4 versões medidas rigorosamente sob o mesmo protocolo:
 
 | Abordagem | F1-Score Médio (CV) | Retenção de Desempenho | Redução de Atributos | Análise Técnica |
 | :--- | :---: | :---: | :---: | :--- |
-| **Baseline (Sem seleção)** | **0,6851** | **100,0%** (Referência) | 0% (5.000 n-grams) | **Melhor versão.** Preserva a rica cauda longa de vocabulário insatisfatório. |
-| **Filter (`SelectKBest` $\chi^2$)** | 0,6262 | 91,4% | **70,0%** (1.500 termos) | Mantém >91% do desempenho eliminando 70% dos termos redundantes. |
-| **Embedded (`SelectFromModel` L1)** | 0,6129 | 89,5% | **>70,0%** (esparsificado) | Regularização Lasso zera coeficientes irrelevantes de forma automatizada. |
-| **Redução PCA (`TruncatedSVD`)** | 0,4775 | 69,7% | 100 componentes densos | **Pior versão.** A compressão ortogonal densa dilui termos negativos críticos e raros no ruído. |
+| **Baseline (Sem seleção)** | **0,6874** | **100,0%** (Referência) | 0% (5.000 n-grams) | **Melhor versão.** Preserva a rica cauda longa de termos negativos específicos. |
+| **Filter (`SelectKBest` $\chi^2$)** | 0,6472 | 94,2% | **70,0%** (1.500 termos) | Mantém >94% do desempenho eliminando 70% dos termos redundantes. |
+| **Embedded (`SelectFromModel` L1)** | 0,6614 | 96,2% | **>70,0%** (esparsificado) | Regularização Lasso zera coeficientes irrelevantes de forma automatizada. |
+| **Redução PCA (`TruncatedSVD`)** | 0,4862 | 70,7% | 100 componentes densos | **Pior versão.** A compressão ortogonal densa dilui termos negativos críticos e raros no ruído. |
 
 > **Nota Metodológica:** Para matrizes TF-IDF esparsas, o `TruncatedSVD` é o equivalente matematicamente correto do PCA, pois o PCA tradicional exigiria centralizar a matriz na média ($\mathbf{X} - \boldsymbol{\mu}$), destruindo a esparsidade e excedendo a capacidade de memória RAM.
 
 ### 4.3 Avaliação Final no Conjunto de Teste Independente ($N = 3.678$)
 
-O modelo campeão foi avaliado uma única vez no teste congelado:
+O Linear SVM campeão foi avaliado uma única vez no teste congelado:
 
-- **Recall da Classe Negativa (1):** **82,43%** (o modelo detecta 8 de cada 10 insatisfações reais);
-- **F1-Score da Classe Negativa (1):** **0,6778**;
-- **Precisão da Classe Negativa (1):** **0,5755**;
-- **Área sob a Curva Precision-Recall (PR-AUC):** **0,7977** (frente a um baseline aleatório de apenas 0,0805);
-- **ROC-AUC:** **0,9716**;
-- **Acurácia Global (informativa):** 93,69%.
+- **F1-Score da Classe Negativa (1):** **0,7044**;
+- **Recall da Classe Negativa (1):** **77,70%** (detecta quase 8 de cada 10 insatisfações reais);
+- **Precisão da Classe Negativa (1):** **64,43%**;
+- **Área sob a Curva Precision-Recall (PR-AUC):** **0,7843** (frente a um baseline aleatório de apenas 0,0805);
+- **ROC-AUC:** **0,9689**;
+- **Acurácia Global (informativa):** 94,75%.
 
 ### 4.4 Diagnóstico Léxico de Ruído nos Rótulos e Estudo de Ablação
 
 - **Diagnóstico com VADER:** Sinalizou **887 casos de divergência extrema** (4,82% da base), sendo 371 em avaliações de nota 1-2 com texto altamente elogioso e 516 em avaliações de nota 4-5 com texto altamente crítico.
-- **Ablação Experimental:** Removendo os 711 casos suspeitos **exclusivamente do conjunto de treino** e reavaliando no **mesmo teste original**, o F1-score variou discretamente de 0,6778 para 0,6931. Isso comprova que classificadores lineares com TF-IDF já possuem robustez intrínseca a ruídos pontuais, dispensando descarte indiscriminado de dados.
+- **Ablação Experimental:** Removendo os 711 casos suspeitos **exclusivamente do conjunto de treino** e reavaliando no **mesmo teste original**, o F1-score manteve estabilidade (0,7044 vs 0,6988). Isso comprova que classificadores lineares como o SVM com TF-IDF já possuem robustez intrínseca a ruídos pontuais.
 
 ---
 
 ## 5. Resposta à Pergunta de Pesquisa
 
 > **Conclusão:** **Sim, é plenamente possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha.**
-> Com técnicas clássicas da disciplina (TF-IDF + Regressão Logística ponderada), o sistema identifica 82,4% de todas as avaliações negativas na base de teste, permitindo que plataformas de e-commerce identifiquem insatisfações críticas de clientes de forma automatizada.
+> Com técnicas clássicas da disciplina (TF-IDF + Linear SVM ponderado), o sistema identifica 77,7% de todas as avaliações negativas na base de teste com F1 de 0,7044 e ROC-AUC de 0,9689, superando expressivamente qualquer classificador ingênuo.
 
 ---
 
@@ -108,7 +110,7 @@ A Seção 13 do notebook [`projeto_integrador_mineracao_dados.ipynb`](projeto_in
 1. **Binarização do Alvo:** Por que remover nota 3? (Para focar na polaridade de sentimento sem ambiguidade).
 2. **Prevenção de Vazamento:** Por que usar `Pipeline`? (Para garantir que TF-IDF e seleção nunca vejam o teste).
 3. **TF-IDF:** Por que unigramas + bigramas? (Para capturar negações como *"not good"* e termos como *"waste time"*).
-4. **Modelos:** Por que Regressão Logística superou Naive Bayes? (Pela ponderação `class_weight='balanced'`).
+4. **Classificadores da Disciplina:** Por que Linear SVM e Regressão Logística? (Ambos são modelos citados no PDF; o Linear SVM venceu com F1 de 0,6874 no treino e 0,7044 no teste).
 5. **Seleção vs Redução:** Por que o PCA/SVD foi pior? (Porque palavras raras e decisivas são diluídas em componentes densos).
 6. **Métricas e Custo do Erro:** Por que focar no Recall/F1 e não na acurácia? (Porque o custo de ignorar um cliente insatisfeito é alto e a base tem 92% de positivos).
 7. **Ruído de Rótulos:** O ruído foi comprovado? (Não, é uma hipótese tratada como suspeita diagnóstica investigada por ablação).
