@@ -19,16 +19,28 @@ Projeto completo da disciplina de Mineração de Dados investigando a pergunta d
 
 ---
 
-## 2. Estrutura do Repositório
+## 2. Estrutura do Repositório e Entregáveis do Item 5
+
+O projeto cumpre integralmente os **três entregáveis exigidos no Item 5 do regulamento**:
+
+| Entregável do Item 5 | Arquivo no Repositório | Descrição |
+| :--- | :--- | :--- |
+| **1. Notebook (.ipynb)** | [`projeto_integrador_mineracao_dados.ipynb`](projeto_integrador_mineracao_dados.ipynb) | Notebook principal com as 5 etapas obrigatórias + Mineração de Texto (TF-IDF + SVM) + Guia de Estudo. |
+| **2. Relatório (4 a 6 páginas)** | [`relatorio_projeto_integrador.md`](relatorio_projeto_integrador.md) / [`relatorio_projeto_integrador.html`](relatorio_projeto_integrador.html) | Artigo acadêmico formal completo (pergunta, base, pipeline, resultados, limites e conclusão). |
+| **3. Slides da Apresentação** | [`apresentacao_slides.md`](apresentacao_slides.md) / [`apresentacao_slides.html`](apresentacao_slides.html) | Slides para apresentação oral de 10 minutos com roteiro de arguição para os integrantes. |
 
 ```text
 projeto_final/
-├── README.md                                  # Documentação completa, metodologia e guia de estudo
-├── requirements.txt                          # Dependências (scikit-learn, nltk, pandas, etc.)
+├── README.md                                  # Visão geral, metodologia e documentação
+├── requirements.txt                          # Dependências Python
 ├── LICENSE                                   # Licença de código aberto (MIT)
 ├── contexto/
 │   └── PROJETO_INTEGRADOR.pdf                # Diretrizes e rubrica oficial da disciplina
-├── projeto_integrador_mineracao_dados.ipynb  # NOTEBOOK PRINCIPAL: Análise, Modelagem e Guia de Estudo
+├── projeto_integrador_mineracao_dados.ipynb  # ENTREGÁVEL 1: Notebook Principal auto-contido
+├── relatorio_projeto_integrador.md           # ENTREGÁVEL 2: Relatório acadêmico (4 a 6 páginas)
+├── relatorio_projeto_integrador.html         # Versão HTML para leitura e impressão em PDF
+├── apresentacao_slides.md                    # ENTREGÁVEL 3: Deck de Slides (Marp / Markdown)
+├── apresentacao_slides.html                  # Apresentação interativa em HTML para projetar no navegador
 ├── extrair_amostra_20k_amazon_books.ipynb     # Notebook de proveniência e amostragem dos dados
 └── outputs/                                  # Dados gerados, metadados e figuras
     ├── books_reviews_sample_20k_seed_20261109.csv           # Amostra tabular (UTF-8, N = 20.000)

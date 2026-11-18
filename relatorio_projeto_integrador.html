@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Acadêmico - Projeto Integrador UEL</title>
+    <style>
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #222;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 50px;
+            background: #ffffff;
+            font-size: 11pt;
+        }
+        h1 {
+            font-size: 17pt;
+            color: #1a2a3a;
+            text-align: center;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        h2 {
+            font-size: 13pt;
+            color: #2b5c8f;
+            border-bottom: 1.5px solid #2b5c8f;
+            padding-bottom: 4px;
+            margin-top: 26px;
+            margin-bottom: 12px;
+        }
+        h3 {
+            font-size: 11.5pt;
+            color: #333;
+            margin-top: 18px;
+            margin-bottom: 6px;
+        }
+        h4 {
+            font-size: 11pt;
+            color: #444;
+            margin-top: 14px;
+            margin-bottom: 4px;
+        }
+        p {
+            text-align: justify;
+            text-indent: 1.5em;
+            margin-bottom: 10px;
+        }
+        ul {
+            margin-left: 28px;
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 4px;
+            text-align: justify;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 9.5pt;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px 10px;
+            text-align: left;
+        }
+        th {
+            background: #f0f4f8;
+            color: #1a2a3a;
+            font-weight: bold;
+        }
+        blockquote {
+            border-left: 4px solid #2b5c8f;
+            background: #f8fafc;
+            padding: 10px 16px;
+            margin: 14px 0;
+            font-style: italic;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        @media print {
+            body {
+                padding: 12mm 15mm;
+                max-width: 100%;
+                font-size: 10pt;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Mineração de Texto para Previsão de Avaliações Negativas em E-commerce de Livros: Uma Abordagem com TF-IDF e Support Vector Machines</h1>
+<p><strong>Disciplina:<strong> Mineração de Dados (2COP024) — 2º Semestre de 2026</p>
+<p><strong>Instituição:<strong> Universidade Estadual de Londrina (UEL) — Departamento de Ciência da Computação</p>
+<p><strong>Integrantes:<strong> Grupo de Trabalho Acadêmico</p>
+<p><strong>Repositório Oficial:<strong> [github.com/luticaa/mineracao-de-dados-projeto-final](https://github.com/luticaa/mineracao-de-dados-projeto-final.git)</p>
+<hr>
+<h2>Resumo Executivo</h2>
+<p>Este relatório apresenta os resultados do Projeto Integrador de Mineração de Dados, cujo objetivo é responder à pergunta: <em>“É possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha?”<em>. Utilizando uma amostra controlada de 20.000 avaliações da categoria <em>Books<em> do repositório <em>Amazon Reviews 2023<em>, formulou-se um problema de classificação binária supervisionada (Notas 1-2 $\rightarrow$ Negativa / Classe 1; Notas 4-5 $\rightarrow$ Positiva / Classe 0; Nota 3 excluída por neutralidade ambivalente). Adotou-se representação vetorial TF-IDF com unigramas e bigramas integrada estritamente em <em>Pipelines<em> do Scikit-Learn para prevenção absoluta de vazamento de dados (<em>data leakage<em>). Na comparação de modelos exigida pelo regulamento, a Máquina de Vetores de Suporte Linear (<em>Linear SVM<em>) superou a Regressão Logística, atingindo F1-Score médio de 0,6874 na validação cruzada 5-fold. Na análise de atributos da Etapa 4, os métodos de seleção (<em>Filter<em> via $\chi^2$ e <em>Embedded<em> via Lasso L1) retiveram entre 94% e 96% do desempenho com eliminação de mais de 70% dos termos, enquanto a redução dimensional por <em>TruncatedSVD<em> (equivalente ao PCA para dados esparsos) sofreu forte degradação (F1 de 0,4862) devido à diluição de termos negativos críticos em vetores densos. No conjunto de teste independente congelado ($N = 3.678$), o modelo campeão alcançou <strong>Recall de 77,70%<strong>, <strong>F1-Score de 0,7044<strong>, <strong>ROC-AUC de 0,9689<strong> e <strong>PR-AUC de 0,7843<strong>, confirmando a viabilidade técnica e a relevância prática da abordagem para mitigação de abandono de clientes (<em>churn<em>) em comércio eletrônico.</p>
+<hr>
+<h2>1. Introdução e Pergunta de Pesquisa</h2>
+<p>No comércio eletrônico moderno, plataformas como a Amazon processam dezenas de milhares de avaliações diárias. A leitura manual e individual de cada comentário é operacionalmente inviável para as equipes de atendimento, curadoria editorial e controle de qualidade. Nesse ecossistema, as avaliações com notas baixas (críticas, frustrações com enredo, edições corrompidas, problemas de encadernação ou propaganda enganosa) carregam um peso econômico desproporcional: consumidores insatisfeitos que não recebem resposta rápida tendem ao abandono da plataforma (<em>churn<em>), cancelamento de assinaturas e difusão de impressões negativas.</p>
+<p>Diante desse desafio prático de inteligência de negócios, formulou-se a seguinte pergunta de pesquisa da disciplina:</p>
+<blockquote><strong>“É possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha?”<strong></blockquote>
+<p>A tarefa foi modelada como um problema de <strong>classificação binária supervisionada<strong> utilizando processamento de linguagem natural e mineração de texto clássica. O foco principal não é alcançar acurácia ilusória em classes desbalanceadas, mas sim maximizar a capacidade de detecção de avaliações insatisfatórias (<em>Recall<em> e <em>F1-Score da Classe Negativa<em>), respeitando as diretrizes de integridade metodológica e ausência de vazamento de dados.</p>
+<hr>
+<h2>2. Base de Dados, Proveniência e Engenharia da Variável-Alvo</h2>
+<h3>2.1 Proveniência dos Dados e Amostragem Resiliente</h3>
+<p>Os dados brutos provêm do repositório acadêmico oficial <strong>Amazon Reviews 2023<strong> (McAuley Lab / UCSD), categoria `Books`. A população original dessa categoria compreende cerca de 29,5 milhões de avaliações (~20,1 GB em formato JSONL compactado).</p>
+<p>Para atender ao critério de reprodutibilidade e execução eficiente em ambiente local ou Google Colab, foi desenvolvido um pipeline de extração por streaming HTTP direto (`extrair_amostra_20k_amazon_books.ipynb`) utilizando o <strong>Algoritmo de Reservatório Bounded<strong> (Vitter, 1985). O pipeline limitou o consumo de memória RAM a menos de 200 MB ($O(N)$), interrompendo a leitura ao atingir ~10% das linhas do arquivo bruto, extraindo exatamente <strong>20.000 registros<strong> com semente determinística `20261109`. A integridade do arquivo gerado (`outputs/books_reviews_sample_20k_seed_20261109.csv`) foi validada por hash SHA-256 e registrada em metadados formais.</p>
+<h3>2.2 Dicionário de Colunas Utilizadas</h3>
+<table>
+<tr><th>Coluna</th><th>Tipo Original</th><th>Papel no Pipeline</th><th>Descrição Semântica</th></tr>
+<tr><td>`rating`</td><td>`float64`</td><td>Definição do Alvo</td><td>Nota de 1.0 a 5.0 estrelas atribuída pelo cliente.</td></tr>
+<tr><td>`title`</td><td>`object`</td><td>Entrada Textual</td><td>Título síntese da resenha.</td></tr>
+<tr><td>`text`</td><td>`object`</td><td>Entrada Textual</td><td>Conteúdo dissertativo da resenha.</td></tr>
+<tr><td>`parent_asin`</td><td>`object`</td><td>Metadado de Controle</td><td>Identificador do produto editorial na Amazon.</td></tr>
+<tr><td>`user_id`</td><td>`object`</td><td>Metadado de Controle</td><td>Identificador do usuário avaliador.</td></tr>
+</table>
+<h3>2.3 Formulação da Variável-Alvo (`is_negative`)</h3>
+<p>A distribuição das notas nas 20.000 avaliações brutas evidenciou o comportamento assimétrico típico de sistemas de recomendação de livros:</p>
+<ul>
+<li><strong>1.0 estrela:<strong> 737 avaliações (3,68%);</li>
+<li><strong>2.0 estrelas:<strong> 741 avaliações (3,70%);</li>
+<li><strong>3.0 estrelas:<strong> 1.612 avaliações (8,06%);</li>
+<li><strong>4.0 estrelas:<strong> 3.420 avaliações (17,10%);</li>
+<li><strong>5.0 estrelas:<strong> 13.490 avaliações (67,45%).</li>
+</ul>
+<p>Conforme estabelecido na literatura de análise de sentimentos (Pang & Lee, 2008), avaliações de 3 estrelas são ambivalentes e reúnem elogios parciais e ressalvas moderadas, constituindo uma zona cinzenta que prejudica a separabilidade de classes polares. Portanto, a nota 3.0 foi excluída da modelagem (1.612 linhas descartadas).</p>
+<p>O alvo binário final foi estabelecido de forma transparente e consistente:</p>
+<ul>
+<li><strong>Notas 1.0 e 2.0 $\rightarrow$ Classe 1 (Avaliação Negativa):<strong> 1.478 exemplos (<strong>8,04%<strong>);</li>
+<li><strong>Notas 4.0 e 5.0 $\rightarrow$ Classe 0 (Avaliação Positiva):<strong> 16.910 exemplos (<strong>91,96%<strong>).</li>
+<li><strong>Base elegível final:<strong> <strong>18.388 exemplos<strong> (proporção de ~11,4 positivas para cada negativa).</li>
+</ul>
+<hr>
+<h2>3. Metodologia e Prevenção Estrita de Vazamento (*Data Leakage*)</h2>
+<h3>3.1 Protocolo de Partição dos Dados</h3>
+<p>Em cumprimento rigoroso à Seção 7 do regulamento da disciplina (<em>Erros que mais tiram nota: Vazamento<em>), adotou-se o seguinte protocolo:</p>
+<p>1. <strong>Separação Estratificada Prévia:<strong> Antes de qualquer etapa de vetorização, vocabulário ou aprendizado, os 18.388 registros foram divididos em <strong>80% para Treino (14.710)<strong> e <strong>20% para Teste (3.678)<strong> utilizando `train_test_split` estratificado pela classe e com semente determinística (`random_state=42`).</p>
+<p>2. <strong>Congelamento do Teste:<strong> O conjunto de teste foi completamente isolado, não sendo utilizado em nenhuma escolha de hiperparâmetros, limiares de decisão ou seleção de vocabulário.</p>
+<p>3. <strong>Encapsulamento em Pipelines:<strong> Todas as operações estatísticas (cálculo de frequências $IDF$, seleção de atributos por teste Qui-Quadrado, projeção por SVD e ajuste dos classificadores) foram executadas <strong>exclusivamente dentro de objetos `Pipeline` do Scikit-Learn<strong> no âmbito de cada partição de treino da validação cruzada.</p>
+<h3>3.2 Mineração de Texto e TF-IDF</h3>
+<p>Para maximizar a riqueza informacional, concatenou-se o título e o corpo da resenha (`review_full = title + " " + text`), uma vez que títulos concisos frequentemente resumem o descontentamento (ex.: <em>"Péssima edição"<em> ou <em>"Waste of money"<em>).</p>
+<p>O vetorizador `TfidfVectorizer` foi parametrizado com:</p>
+<ul>
+<li>`ngram_range=(1, 2)`: Captura termos isolados e pares contíguos de palavras, viabilizando o aprendizado de modificadores de negação essenciais (como <em>"not good"<em>, <em>"not recommend"<em>, <em>"waste time"<em>);</li>
+<li>`min_df=3`: Elimina erros ortográficos singulares e palavras com frequência estritamente pontual;</li>
+<li>`max_df=0.90`: Descarta termos que ocorrem em mais de 90% dos documentos (como <em>"book"<em>), reduzindo a esparsidade desnecessária;</li>
+<li>`sublinear_tf=True`: Aplica escala logarítmica ($1 + \log(TF)$) para atenuar a influência de termos repetidos excessivamente em resenhas prolixas;</li>
+<li>`max_features=5000`: Limita o espaço dimensional aos 5.000 n-grams mais relevantes no treino.</li>
+</ul>
+<hr>
+<h2>4. Modelagem e Validação Cruzada dos Classificadores da Disciplina</h2>
+<p>Conforme exigido na Etapa 3 da disciplina (<em>"pelo menos dois classificadores da disciplina (árvore, floresta, boosting, SVM, logística...), ajustados por validação cruzada"<em>), comparou-se dois métodos com fundamentos matemáticos complementares:</p>
+<p>1. <strong>Máquina de Vetores de Suporte Linear (`LinearSVC`):<strong> Método de margem máxima que encontra o hiperplano de separação ótimo minimizando a função de perda <em>hinge<em> com penalidade L2. É amplamente consolidado como um dos métodos mais robustos para texto esparso em alta dimensão.</p>
+<p>2. <strong>Regressão Logística (`LogisticRegression`):<strong> Modelo linear discriminativo probabilístico baseado na minimização da perda logística (<em>cross-entropy / log-loss<em>).</p>
+<p>Ambos os modelos foram configurados com o parâmetro `class_weight='balanced'`, que penaliza os erros na classe minoritária proporcionalmente ao inverso da sua frequência na base de treino.</p>
+<p>A busca em grade de hiperparâmetros (parâmetro de regularização $C \in \{0.1, 0.5, 1.0, 2.0\}$) foi conduzida via <strong>Validação Cruzada Estratificada com 5 Folds (`StratifiedKFold`)<strong> exclusivamente no conjunto de treino, otimizando o <strong>F1-Score da Classe Negativa (1)<strong>.</p>
+<h3>Tabela 1: Resultado da Validação Cruzada Estratificada (5 Folds no Treino)</h3>
+<table>
+<tr><th>Classificador</th><th>F1-Score Médio (CV)</th><th>Desvio Padrão ($\sigma$)</th><th>Melhor Hiperparâmetro</th></tr>
+<tr><td>**Linear SVM (`LinearSVC`)** *(Campeão)*</td><td>**0,6874**</td><td>**$\pm 0,0189$**</td><td>**$C = 0.5$**</td></tr>
+<tr><td>**Regressão Logística**</td><td>0,6851</td><td>$\pm 0,0142$</td><td>$C = 2.0$</td></tr>
+</table>
+<p>Ambos os modelos apresentaram desempenho competitivo e elevado. O <strong>Linear SVM<strong> alcançou a liderança empírica com F1-Score de <strong>0,6874<strong>, sendo selecionado como o classificador campeão para a etapa de seleção e redução de atributos.</p>
+<hr>
+<h2>5. Comparação Obrigatória: Seleção e Redução de Atributos</h2>
+<p>Atendendo estritamente à Etapa 4 do regulamento (<em>"com o melhor classificador, comparar três versões medidas da mesma forma: sem nada, com seleção de atributos (pelo menos dois métodos, por exemplo um filter e um embedded) e com redução de dimensionalidade (PCA); dizer qual funcionou melhor e por quê"<em>), avaliou-se 4 arquiteturas baseadas no <strong>Linear SVM<strong> sob validação cruzada estratificada em 5 folds:</p>
+<p>1. <strong>Baseline (Sem nada):<strong> Vetor TF-IDF original completo com 5.000 n-grams;</p>
+<p>2. <strong>Método Filter:<strong> `SelectKBest` utilizando o teste estatístico Qui-Quadrado ($\chi^2$), retendo os 1.500 termos mais associados à classe negativa;</p>
+<p>3. <strong>Método Embedded:<strong> `SelectFromModel` acoplado a um estimador `LinearSVC` com regularização L1 (Lasso), promovendo a seleção intrínseca de variáveis ao zerar os coeficientes de termos redundantes;</p>
+<p>4. <strong>Redução Dimensional (PCA / TruncatedSVD):<strong> `TruncatedSVD` com 100 componentes principais.</p>
+<blockquote><strong>Fundamentação Matemática do TruncatedSVD:<strong> Em processamento de linguagem natural, matrizes TF-IDF são altamente esparsas (>98% de zeros). A aplicação do PCA convencional requer a centralização dos dados pela média amostral ($\mathbf{X} - \boldsymbol{\mu}$), o que destrói a esparsidade da matriz e causaria estouro imediato de memória RAM. O `TruncatedSVD` calcula a decomposição em valores singulares diretamente sobre a matriz esparsa, constituindo a realização computacional e matematicamente adequada do PCA para texto.</blockquote>
+<h3>Tabela 2: Comparação de Seleção e Redução de Atributos (5-Fold CV F1)</h3>
+<table>
+<tr><th>Abordagem</th><th>F1-Score Médio</th><th>Desvio Padrão</th><th>Retenção de Desempenho</th><th>Atributos Efetivos</th></tr>
+<tr><td>**Baseline (Sem seleção)**</td><td>**0,6874**</td><td>**$\pm 0,0189$**</td><td>**100,0% (Referência)**</td><td>5.000 termos</td></tr>
+<tr><td>**Filter (`SelectKBest` $\chi^2$)**</td><td>0,6472</td><td>$\pm 0,0094$</td><td>94,2%</td><td>1.500 termos (70% redução)</td></tr>
+<tr><td>**Embedded (`SelectFromModel` L1)**</td><td>0,6614</td><td>$\pm 0,0160$</td><td>96,2%</td><td>~1.400 termos (>70% redução)</td></tr>
+<tr><td>**Redução PCA (`TruncatedSVD`)**</td><td>0,4862</td><td>$\pm 0,0129$</td><td>70,7%</td><td>100 componentes densos</td></tr>
+</table>
+<h3>Análise Técnica: Qual funcionou melhor e por quê?</h3>
+<ul>
+<li><strong>Melhor Versão:<strong> O <strong>Baseline (Sem nada)<strong> obteve o maior F1-Score (0,6874). Em problemas de análise de sentimentos, a riqueza de vocabulário na cauda longa (palavras raras mas decisivas de insatisfação) confere poder discriminatório que supera o ganho de parcimônia.</li>
+<li><strong>Eficiência dos Métodos de Seleção:<strong> Tanto o método <em>Filter<em> quanto o <em>Embedded<em> demonstraram excelente eficiência, preservando entre 94% e 96% do poder preditivo original enquanto eliminaram mais de 70% da dimensionalidade. Em sistemas embarcados ou com restrição estrita de latência, o método <em>Embedded<em> representaria a melhor escolha de compromisso.</li>
+<li><strong>Degradação Acentuada da Redução Dimensional (PCA/SVD):<strong> A projeção em 100 componentes densos sofreu uma queda drástica de quase 30% no F1-Score (0,4862). Isso decorre da natureza intrínseca do sinal semântico textual: enquanto termos esparsos específicos (como <em>"terrible"<em>, <em>"waste"<em>, <em>"horrible"<em>, <em>"damaged"<em>) atuam como chaves de alta polaridade, a compressão ortogonal do PCA projeta esses termos em combinações lineares densas que agregam ruído de milhares de termos neutros, diluindo o sinal polarizador da classe minoritária.</li>
+</ul>
+<hr>
+<h2>6. Avaliação Final pelo Custo do Erro no Conjunto de Teste</h2>
+<p>O modelo campeão (<strong>Linear SVM Baseline<strong>) foi ajustado sobre a totalidade do conjunto de treino (14.710 exemplos) e submetido a uma <strong>avaliação única no conjunto de teste independente congelado (3.678 exemplos)<strong>.</p>
+<h3>6.1 Análise do Custo Assimétrico do Erro</h3>
+<p>Em e-commerce, os custos de classificação incorreta são severamente assimétricos:</p>
+<ul>
+<li><strong>Falso Negativo (FN):<strong> Um cliente que detestou a compra é rotulado como satisfeito. <strong>Custo Crítico (Alto):<strong> O cliente insatisfeito é ignorado, gerando atrito no pós-venda, avaliações destrutivas na plataforma e perda irreversível do cliente (<em>churn<em>).</li>
+<li><strong>Falso Positivo (FP):<strong> Um cliente satisfeito é sinalizado preventivamente como insatisfeito. <strong>Custo Mínimo (Baixo):<strong> Um atendente ou sistema automatizado revisa a resenha e constata que o usuário estava satisfeito, sem prejuízo ao negócio.</li>
+</ul>
+<p>Portanto, o modelo deve priorizar um <strong>Recall elevado para a Classe Negativa<strong>, controlando a Precisão para evitar sobrecarga operacional.</p>
+<h3>Tabela 3: Relatório de Desempenho no Conjunto de Teste Independente ($N = 3.678$)</h3>
+<table>
+<tr><th>Classe</th><th>Precisão</th><th>Recall</th><th>F1-Score</th><th>Suporte Real</th></tr>
+<tr><td>**Positiva (Classe 0: 4-5 estrelas)**</td><td>0,9799</td><td>0,9624</td><td>0,9711</td><td>3.382</td></tr>
+<tr><td>**Negativa (Classe 1: 1-2 estrelas)**</td><td>**0,6443**</td><td>**0,7770**</td><td>**0,7044**</td><td>**296**</td></tr>
+<tr><td>**Média Ponderada**</td><td>0,9529</td><td>0,9475</td><td>0,9496</td><td>3.678</td></tr>
+<tr><td>**Acurácia Global (Informativa)**</td><td>—</td><td>—</td><td>**0,9475**</td><td>3.678</td></tr>
+</table>
+<h3>Métricas Globais da Detecção de Insatisfação:</h3>
+<ul>
+<li><strong>Recall da Classe Negativa:<strong> <strong>77,70%<strong> (detecta aproximadamente 8 em cada 10 insatisfações reais do público);</li>
+<li><strong>F1-Score da Classe Negativa:<strong> <strong>0,7044<strong>;</li>
+<li><strong>Área sob a Curva Precision-Recall (PR-AUC):<strong> <strong>0,7843<strong> (superando com folga o piso aleatório de 0,0805);</li>
+<li><strong>ROC-AUC:<strong> <strong>0,9689<strong>, demonstrando alta capacidade de discriminação ordinal entre as classes.</li>
+</ul>
+<h3>Matriz de Confusão no Teste:</h3>
+<ul>
+<li>Verdadeiros Positivos da Insatisfação (TP): <strong>230<strong> avaliações negativas identificadas corretamente;</li>
+<li>Falsos Negativos (FN): <strong>66<strong> avaliações negativas não detectadas;</li>
+<li>Verdadeiros Negativos (TN): <strong>3.255<strong> avaliações positivas confirmadas;</li>
+<li>Falsos Positivos (FP): <strong>127<strong> avaliações positivas classificadas preventivamente como negativas.</li>
+</ul>
+<hr>
+<h2>7. Diagnóstico Léxico de Ruído nos Rótulos e Estudo de Ablação</h2>
+<h3>7.1 Diagnóstico com VADER</h3>
+<p>Investigou-se se discrepâncias entre o texto redigido e a nota atribuída poderiam representar ruído de rótulo (<em>label noise<em>) derivado de toques acidentais (<em>miss-clicks<em>) ou críticas direcionadas à entrega.</p>
+<p>Utilizando o analisador léxico <strong>VADER<strong> (`SentimentIntensityAnalyzer`, pacote `nltk`), estabeleceu-se um critério conservador de divergência extrema ($|score| \ge 0,60$):</p>
+<ul>
+<li><strong>Suspeitas em Negativas (Nota 1-2 com texto léxico $\ge +0.60$):<strong> 371 casos (25,10% das negativas);</li>
+<li><strong>Suspeitas em Positivas (Nota 4-5 com texto léxico $\le -0.60$):<strong> 516 casos (3,05% das positivas);</li>
+<li><strong>Total sinalizado:<strong> <strong>887 avaliações (4,82% da base elegível)<strong>.</li>
+</ul>
+<h3>7.2 Estudo de Ablação Experimental</h3>
+<p>Para avaliar o impacto desses casos sem comprometer a integridade do teste, executou-se um experimento de ablação:</p>
+<ul>
+<li><strong>Cenário Referência:<strong> Modelo treinado com todos os 14.710 exemplos de treino;</li>
+<li><strong>Cenário Experimental:<strong> Remoção dos 711 casos suspeitos <strong>estritamente do conjunto de treino<strong> (13.999 exemplos restantes).</li>
+<li><strong>Ambiente de Teste Comum:<strong> Ambos os modelos foram avaliados no <strong>mesmo conjunto de teste original (3.678 exemplos)<strong>, com os mesmos rótulos intocados.</li>
+</ul>
+<h3>Tabela 4: Comparação da Ablação de Ruído no Conjunto de Teste Comum</h3>
+<table>
+<tr><th>Cenário</th><th>Exemplos de Treino</th><th>F1-Score Negativo (Teste)</th><th>PR-AUC (Teste)</th></tr>
+<tr><td>**Referência (Treino com Ruído Natural)**</td><td>14.710</td><td>**0,7044**</td><td>**0,7843**</td></tr>
+<tr><td>**Experimental (Treino Sem Suspeitas VADER)**</td><td>13.999</td><td>0,6988</td><td>0,7778</td></tr>
+</table>
+<p><strong>Conclusão Metodológica Sóbria:<strong> A exclusão dos casos suspeitos no treino não gerou ganho expressivo de desempenho no teste real, apresentando variação residual de 0,7044 para 0,6988. Esse achado comprova que:</p>
+<p>1. O classificador Linear SVM com regularização L2 e representação TF-IDF já possui elevada robustez contra ruídos esparsos de rotulação;</p>
+<p>2. Descartar avaliações com base em heurísticas léxicas simples pode remover resenhas legítimas ricas em sarcasmo ou enredos trágicos (ex.: livros de terror ou drama descritos como <em>"horrible"<em> ou <em>"terrifying"<em>, mas com nota 5 estrelas).</p>
+<hr>
+<h2>8. Interpretação dos Coeficientes e Termos Mais Informativos</h2>
+<p>A inspeção dos coeficientes do hiperplano do `LinearSVC` validou a consistência semântica do aprendizado:</p>
+<ul>
+<li><strong>Termos com Maior Peso para Classe Negativa (Classe 1):<strong> <em>"waste"<em>, <em>"not"<em>, <em>"poor"<em>, <em>"disappointed"<em>, <em>"boring"<em>, <em>"return"<em>, <em>"waste time"<em>, <em>"worst"<em>, <em>"terrible"<em>, <em>"dont waste"<em>, <em>"awful"<em>.</li>
+<li><strong>Termos com Maior Peso para Classe Positiva (Classe 0):<strong> <em>"great"<em>, <em>"excellent"<em>, <em>"loved"<em>, <em>"must read"<em>, <em>"best"<em>, <em>"highly recommend"<em>, <em>"wonderful"<em>, <em>"easy read"<em>, <em>"beautiful"<em>, <em>"amazing"<em>.</li>
+</ul>
+<p>A presença de bigramas explícitos como <em>"waste time"<em> e <em>"dont waste"<em> entre os termos mais punitivos comprova a importância da escolha de $n$-grams compostos para superar limitações clássicas de modelos <em>Bag of Words<em> simples.</p>
+<hr>
+<h2>9. Limitações Conhecidas</h2>
+<p>1. <strong>Escopo da Amostra Bounded:<strong> Para conter consumo de rede e permitir reprodutibilidade ágil, a amostragem percorreu o trecho inicial da base da Amazon, podendo carregar viés cronológico ou de lotes de upload.</p>
+<p>2. <strong>Contexto Semântico Profundo:<strong> Modelos baseados em TF-IDF não codificam relações sintáticas de longa distância nem dependências anafóricas complexas presentes em análises literárias aprofundadas.</p>
+<p>3. <strong>Generalização Multidomínio:<strong> O vocabulário otimizado é específico para resenhas de livros (<em>Books<em>), necessitando de recalibração para categorias com léxicos distintos (como eletrônicos ou vestuário).</p>
+<hr>
+<h2>10. Conclusão</h2>
+<p>Este trabalho respondeu afirmativamente e de forma conclusiva à pergunta central da disciplina:</p>
+<blockquote><strong>Sim, é perfeitamente possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha.<strong></blockquote>
+<p>Utilizando uma arquitetura clássica e fundamentada de Mineração de Dados — representação TF-IDF acoplada a uma Máquina de Vetores de Suporte Linear (<em>Linear SVM<em>) com balanceamento de classes —, o sistema alcançou um <strong>Recall de 77,70%<strong> e <strong>F1-Score de 0,7044<strong> sobre uma base de teste com forte assimetria ($92\%$ positivas), gerando um índice <strong>ROC-AUC de 0,9689<strong>. O protocolo experimental adotou rigor absoluto contra vazamento de dados (<em>data leakage<em>), comparou formalmente técnicas de seleção e redução de atributos e demonstrou a viabilidade de aplicar mineração de texto prática e interpretável em problemas reais de comércio eletrônico.</p>
+<hr>
+<h2>Referências Bibliográficas</h2>
+<p>1. <strong>Cortes, C., & Vapnik, V. (1995).<strong> <em>Support-Vector Networks<em>. Machine Learning, 20(3), pp. 273–297.</p>
+<p>2. <strong>Hutto, C. J., & Gilbert, E. E. (2014).<strong> <em>VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text<em>. In: Eighth International Conference on Weblogs and Social Media (ICWSM-14), Ann Arbor, MI.</p>
+<p>3. <strong>Manning, C. D., Raghavan, P., & Schütze, H. (2008).<strong> <em>Introduction to Information Retrieval<em>. Cambridge University Press.</p>
+<p>4. <strong>McAuley, J., Hou, Y., Li, J., & He, R. (2023).<strong> <em>Amazon Reviews 2023 Dataset<em>. McAuley Lab, University of California San Diego. Disponível em: <https://amazon-reviews-2023.github.io/>.</p>
+<p>5. <strong>Pang, B., & Lee, L. (2008).<strong> <em>Opinion Mining and Sentiment Analysis<em>. Foundations and Trends in Information Retrieval, 2(1–2), pp. 1–135.</p>
+<p>6. <strong>Pedregosa, F. et al. (2011).<strong> <em>Scikit-learn: Machine Learning in Python<em>. Journal of Machine Learning Research, 12, pp. 2825–2830.</p>
+<p>7. <strong>Vitter, J. S. (1985).<strong> <em>Random Sampling with a Reservoir<em>. ACM Transactions on Mathematical Software (TOMS), 11(1), pp. 37–57.</p>
+</body>
+</html>

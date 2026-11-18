@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Apresentação - Projeto Integrador UEL</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #1a202c;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #2d3748;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .deck-container {
+            width: 1024px;
+            height: 640px;
+            position: relative;
+            background: #ffffff;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 40px 60px 45px 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .slide.active {
+            display: flex;
+        }
+        .slide-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 26pt;
+            color: #1a365d;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        h2 {
+            font-size: 19pt;
+            color: #2b6cb0;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+        p {
+            font-size: 13pt;
+            line-height: 1.45;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        ul {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+        li {
+            font-size: 12.5pt;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            color: #2d3748;
+        }
+        .highlight {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 10px 14px;
+            margin: 12px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 13pt;
+            color: #2b6cb0;
+        }
+        table.slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 11pt;
+        }
+        table.slide-table th, table.slide-table td {
+            border: 1px solid #cbd5e0;
+            padding: 6px 10px;
+            text-align: left;
+        }
+        table.slide-table th {
+            background: #edf2f7;
+            color: #2d3748;
+            font-weight: bold;
+        }
+        .slide-footer {
+            font-size: 10pt;
+            color: #a0aec0;
+            border-top: 1px solid #edf2f7;
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: #3182ce;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13pt;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .nav-btn:hover {
+            background: #2b6cb0;
+        }
+        .counter {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 12pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="deck-container">
+        <div class="slide" id="slide-1">
+<div class="slide-content">
+<p>---</p>
+<p>section {</p>
+<p>font-family: 'Segoe UI', Arial, sans-serif;</p>
+<p>font-size: 20px;</p>
+<p>padding: 35px 50px;</p>
+<p>}</p>
+<p>h1 {</p>
+<p>color: #1a365d;</p>
+<p>font-size: 32px;</p>
+<p>}</p>
+<p>h2 {</p>
+<p>color: #2b6cb0;</p>
+<p>font-size: 24px;</p>
+<p>margin-top: 0;</p>
+<p>}</p>
+<p>.highlight {</p>
+<p>background-color: #ebf8ff;</p>
+<p>border-left: 4px solid #3182ce;</p>
+<p>padding: 8px 12px;</p>
+<p>font-weight: 500;</p>
+<p>}</p>
+<p>footer {</p>
+<p>font-size: 12px;</p>
+<p>color: #718096;</p>
+<p>}</p>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 1</div>
+</div><div class="slide" id="slide-2">
+<div class="slide-content">
+<h1>Previsão de Avaliações Negativas em E-commerce de Livros</h1>
+<h2>Mineração de Texto com TF-IDF e Support Vector Machines (SVM)</h2>
+<p><strong>Disciplina:<strong> Mineração de Dados (2COP024) — UEL</p>
+<p><strong>Docente:<strong> Prof. Responsável</p>
+<p><strong>Integrantes do Grupo:<strong> Equipe de Ciência de Dados e IA</p>
+<p><strong>Repositório:<strong> `github.com/luticaa/mineracao-de-dados-projeto-final`</p>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 2</div>
+</div><div class="slide" id="slide-3">
+<div class="slide-content">
+<h2>1. O Problema de Negócio e a Pergunta de Pesquisa</h2>
+<ul>
+<li><strong>Contexto de Negócio:<strong></li>
+<li>O volume massivo de resenhas em plataformas como a Amazon impede a leitura humana manual de cada comentário.</li>
+<li>O custo do erro é <strong>assimétrico<strong>: clientes insatisfeitos não atendidos rapidamente cancelam compras, abandonam a plataforma (<em>churn<em>) e afetam a reputação da loja.</li>
+</ul>
+<ul>
+<li><strong>Pergunta Central de Pesquisa:<strong></li>
+</ul>
+<p><div class="highlight"></p>
+<p>“É possível prever se uma avaliação de livro da Amazon será negativa com base no texto da resenha?”</p>
+<p></div></p>
+<ul>
+<li><strong>Formulação Técnica:<strong> Classificação binária supervisionada de texto livre com métodos clássicos da disciplina.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 3</div>
+</div><div class="slide" id="slide-4">
+<div class="slide-content">
+<h2>2. Base de Dados e Engenharia da Variável-Alvo</h2>
+<ul>
+<li><strong>Dataset Oficial:<strong> <em>Amazon Reviews 2023 (Books)<em> — McAuley Lab / UCSD.</li>
+<li><strong>Amostragem Resiliente:<strong> 20.000 avaliações extraídas por streaming direto via HTTP com <em>Algoritmo de Reservatório Bounded<em> (Seed: `20261109`).</li>
+</ul>
+<ul>
+<li><strong>Binarização Polarizada do Alvo (`is_negative`):<strong></li>
+<li><strong>Notas 1.0 e 2.0 $\rightarrow$ Classe 1 (Negativa):<strong> 1.478 exemplos (<strong>8,04%<strong>);</li>
+<li><strong>Notas 4.0 e 5.0 $\rightarrow$ Classe 0 (Positiva):<strong> 16.910 exemplos (<strong>91,96%<strong>);</li>
+<li><strong>Nota 3.0 $\rightarrow$ Excluída (1.612 casos neutros):<strong> Evita fronteiras cinzentas e ambivalência semântica.</li>
+<li><strong>Base Elegível Final:<strong> <strong>18.388 avaliações<strong> (proporção severa de ~11,4 positivas para cada negativa).</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 4</div>
+</div><div class="slide" id="slide-5">
+<div class="slide-content">
+<h2>3. Rigor Metodológico: Prevenção Estrita de Vazamento</h2>
+<ul>
+<li><strong>O Maior Risco de Penalização na Disciplina:<strong> Vazamento de dados (<em>Data Leakage<em>).</li>
+</ul>
+<ul>
+<li><strong>Protocolo Adotado:<strong></li>
+</ul>
+<p>1. <strong>Divisão Estratificada Prévia:<strong> 80% Treino (14.710) e 20% Teste (3.678) com semente fixa (`random_state=42`).</p>
+<p>2. <strong>Teste 100% Congelado:<strong> O conjunto de teste nunca foi visto por nenhuma etapa de vocabulário, $IDF$, seleção de atributos ou escolha de hiperparâmetros.</p>
+<p>3. <strong>Tudo em `Pipeline` do Scikit-Learn:<strong> O método `fit` de cada transformador rodou estritamente sobre os folds de treino.</p>
+<ul>
+<li><strong>Métrica Orientadora:<strong></li>
+<li>Proibição expressa de usar apenas acurácia (um chute aleatório teria 92% de acurácia).</li>
+<li>Foco absoluto no <strong>F1-Score da Classe Negativa (1)<strong>, <strong>Recall<strong> e <strong>PR-AUC<strong>.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 5</div>
+</div><div class="slide" id="slide-6">
+<div class="slide-content">
+<h2>4. Mineração de Texto e TF-IDF</h2>
+<ul>
+<li><strong>Concatenação de Texto:<strong> `review_full = title + " " + text` (títulos curtos contêm forte carga emocional).</li>
+<li><strong>Configurações do `TfidfVectorizer` dentro do Pipeline:<strong></li>
+<li><strong>Unigramas e Bigramas (`ngram_range=(1, 2)`):<strong> Essencial para capturar negações explícitas (<em>"not good"<em>, <em>"waste time"<em>);</li>
+<li><strong>Filtros de Frequência:<strong> `min_df=3` (descarta erros de digitação) e `max_df=0.90` (elimina termos onipresentes como <em>"book"<em>);</li>
+<li><strong>Escala Sublinear (`sublinear_tf=True`):<strong> $1 + \log(TF)$, suavizando resenhas longas;</li>
+<li><strong>Vocabulário:<strong> 5.000 n-grams mais discriminatórios.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 6</div>
+</div><div class="slide" id="slide-7">
+<div class="slide-content">
+<h2>5. Modelagem: Classificadores Clássicos da Disciplina</h2>
+<ul>
+<li><strong>Comparação Obrigatória (Etapa 3):<strong> Dois modelos citados no PDF com fundamentos matemáticos distintos, ajustados com `class_weight='balanced'`:</li>
+</ul>
+<table class="slide-table">
+<tr><th>Modelo</th><th>Fundamentação</th><th>F1-Score Médio (5-Fold CV)</th><th>Desvio Padrão ($\sigma$)</th></tr>
+<tr><td>**Linear SVM (`LinearSVC`)**</td><td>Margem máxima (*Hinge Loss*)</td><td>**0,6874**</td><td>$\pm 0,0189$</td></tr>
+<tr><td>**Regressão Logística**</td><td>Máxima Verossimilhança (*Log-Loss*)</td><td>0,6851</td><td>$\pm 0,0142$</td></tr>
+</table>
+<ul>
+<li><strong>Classificador Campeão:<strong> <strong>Linear SVM<strong> ($C=0.5$), consagrado na literatura para matrizes esparsas de texto em alta dimensão.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 7</div>
+</div><div class="slide" id="slide-8">
+<div class="slide-content">
+<h2>6. Comparação Obrigatória: Seleção vs. Redução de Atributos</h2>
+<ul>
+<li><strong>Etapa 4 do Regulamento:<strong> Comparar 3 versões no classificador campeão (Linear SVM):</li>
+</ul>
+<table class="slide-table">
+<tr><th>Versão</th><th>Técnica</th><th>F1-Score (CV)</th><th>Retenção</th><th>Análise Técnica</th></tr>
+<tr><td>**Baseline**</td><td>Sem seleção (5.000 termos)</td><td>**0,6874**</td><td>**100%**</td><td>**Vencedor:** Preserva a rica cauda longa de vocabulário insatisfatório.</td></tr>
+<tr><td>**Filter**</td><td>`SelectKBest` ($\chi^2$, 1.500 termos)</td><td>0,6472</td><td>94,2%</td><td>Retém >94% do F1 cortando 70% das variáveis.</td></tr>
+<tr><td>**Embedded**</td><td>`SelectFromModel` (Lasso L1)</td><td>0,6614</td><td>96,2%</td><td>Regularização L1 zera termos irrelevantes.</td></tr>
+<tr><td>**Redução PCA**</td><td>`TruncatedSVD` (100 comp.)</td><td>0,4862</td><td>70,7%</td><td>**Pior versão:** Queda acentuada de quase 30%.</td></tr>
+</table>
+<ul>
+<li><strong>Por que o SVD/PCA degradou?<strong> Em NLP esparso, palavras raras e pontuais (<em>"waste"<em>, <em>"horrible"<em>) têm peso crítico. A compressão em 100 vetores densos dilui esse sinal específico no ruído ortogonal.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 8</div>
+</div><div class="slide" id="slide-9">
+<div class="slide-content">
+<h2>7. Avaliação Final no Conjunto de Teste ($N = 3.678$)</h2>
+<ul>
+<li><strong>Avaliação Única no Teste Independente e Intocado:<strong></li>
+</ul>
+<table class="slide-table">
+<tr><th>Métrica</th><th>Valor Obtido</th><th>Contexto de Negócio</th></tr>
+<tr><td>**Recall da Classe Negativa**</td><td>**77,70%**</td><td>**Detecta quase 8 de cada 10 insatisfações reais.**</td></tr>
+<tr><td>**Precisão da Classe Negativa**</td><td>**64,43%**</td><td>64% das resenhas alertadas são realmente negativas.</td></tr>
+<tr><td>**F1-Score Negativo**</td><td>**0,7044**</td><td>Equilíbrio harmônico sólido sob desbalanceamento.</td></tr>
+<tr><td>**PR-AUC (Precision-Recall)**</td><td>**0,7843**</td><td>Frente a apenas 0,0805 de um baseline aleatório.</td></tr>
+<tr><td>**ROC-AUC**</td><td>**0,9689**</td><td>Excelente separabilidade ordinal das classes.</td></tr>
+</table>
+<ul>
+<li><strong>Matriz de Confusão:<strong> 230 Verdadeiros Positivos (TP) da insatisfação capturados, contra apenas 66 Falsos Negativos (FN).</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 9</div>
+</div><div class="slide" id="slide-10">
+<div class="slide-content">
+<h2>8. Diagnóstico de Ruído nos Rótulos e Estudo de Ablação</h2>
+<ul>
+<li><strong>Diagnóstico Léxico com VADER ($|score| \ge 0,60$):<strong></li>
+<li>Sinalizou 887 avaliações (4,82% da base) com aparente contradição entre nota e texto (ex.: 1★ com texto elogioso ou 5★ com críticas severas).</li>
+<li><strong>Tratadas estritamente como suspeitas para inspeção<strong>, nunca como "erros comprovados".</li>
+</ul>
+<ul>
+<li><strong>Estudo de Ablação (Remoção apenas no Treino, Teste Comum):<strong></li>
+<li><em>Modelo com Treino Normal (14.710 ex.):<em> F1-Score no teste = <strong>0,7044<strong>;</li>
+<li><em>Modelo com Treino Filtrado (13.999 ex.):<em> F1-Score no teste = <strong>0,6988<strong>.</li>
+</ul>
+<ul>
+<li><strong>Conclusão Metodológica Sóbria:<strong> O classificador Linear SVM com TF-IDF já possui estabilidade natural contra ruídos pontuais, dispensando descarte artificial de dados.</li>
+</ul>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 10</div>
+</div><div class="slide" id="slide-11">
+<div class="slide-content">
+<h2>9. Termos Mais Preditivos e Interpretação</h2>
+<ul>
+<li><strong>Inspeção dos Coeficientes do Hiperplano SVM:<strong></li>
+<li><strong>Mais Fortes para Avaliação NEGATIVA (Classe 1):<strong></li>
+</ul>
+<p><em>"waste"<em>, <em>"not"<em>, <em>"poor"<em>, <em>"disappointed"<em>, <em>"boring"<em>, <em>"return"<em>, <em>"waste time"<em>, <em>"worst"<em>, <em>"terrible"<em>, <em>"dont waste"<em>, <em>"awful"<em>.</p>
+<ul>
+<li><strong>Mais Fortes para Avaliação POSITIVA (Classe 0):<strong></li>
+</ul>
+<p><em>"great"<em>, <em>"excellent"<em>, <em>"loved"<em>, <em>"must read"<em>, <em>"best"<em>, <em>"highly recommend"<em>, <em>"wonderful"<em>, <em>"easy read"<em>, <em>"beautiful"<em>.</p>
+<ul>
+<li><strong>Observação Qualitativa:<strong></li>
+</ul>
+<p>Bigramas como <em>"waste time"<em> e <em>"dont waste"<em> receberam pesos expressivos, provando a eficácia dos $n$-grams sobre palavras isoladas.</p>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 11</div>
+</div><div class="slide" id="slide-12">
+<div class="slide-content">
+<h2>10. Conclusão Final e Resposta à Pergunta</h2>
+<p><div class="highlight"></p>
+<p><strong>Resposta Conclusiva:</strong> Sim, é perfeitamente possível prever avaliações negativas de livros a partir do texto da resenha.</p>
+<p></div></p>
+<ul>
+<li><strong>Principais Entregas:<strong></li>
+</ul>
+<p>1. Modelo operacional com <strong>77,7% de Recall<strong> e <strong>0,704 de F1-Score<strong> em base com 92% de desbalanceamento;</p>
+<p>2. Protocolo científico sem qualquer vazamento de dados (<em>data leakage<em>);</p>
+<p>3. Comprovação teórica e empírica de que seleção de atributos supera redução dimensional densa (PCA/SVD) para dados esparsos de texto;</p>
+<p>4. Código, dados e documentação 100% reprodutíveis no GitHub e executáveis no Google Colab.</p>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 12</div>
+</div><div class="slide" id="slide-13">
+<div class="slide-content">
+<h2>11. Guia de Arguição: Perguntas Rápidas da Banca</h2>
+<p>1. <strong>Por que removeram a nota 3.0?<strong></p>
+<p><em>R: Porque a nota 3 reúne prós e contras ambíguos. O objetivo era separar polaridades nítidas de sentimento.<em></p>
+<p>2. <strong>Por que não usaram acurácia como critério?<strong></p>
+<p><em>R: Com 92% de avaliações positivas, um classificador cego teria 92% de acurácia e seria inútil para o negócio.<em></p>
+<p>3. <strong>Por que o Linear SVM venceu a Regressão Logística?<strong></p>
+<p><em>R: Ambos foram muito bem com class_weight='balanced'. O SVM teve ligeira vantagem (0,6874 vs 0,6851) por maximizar a margem geométrica de separação.<em></p>
+<p>4. <strong>Por que o PCA/SVD foi o pior método?<strong></p>
+<p><em>R: Porque TF-IDF depende de palavras negativas pontuais e raras. O SVD mistura essas palavras em 100 componentes densos e dilui o sinal no ruído.<em></p>
+<p>5. <strong>O ruído de rótulo foi confirmado?<strong></p>
+<p><em>R: Não, é tratado como suspeita diagnóstica. A ablação provou que o modelo já é robusto ao ruído natural.<em></p>
+</div>
+<div class="slide-footer">Projeto Integrador · UEL · Mineração de Dados 2026 | Slide 13</div>
+</div>
+    </div>
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">◀ Anterior</button>
+        <span class="counter" id="slideCounter">1 / 13</span>
+        <button class="nav-btn" onclick="nextSlide()">Próximo ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 13;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            currentSlide = Math.max(1, Math.min(n, totalSlides));
+            document.getElementById('slide-' + currentSlide).classList.add('active');
+            document.getElementById('slideCounter').innerText = currentSlide + ' / ' + totalSlides;
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            }
+        });
+
+        showSlide(1);
+    </script>
+</body>
+</html>
