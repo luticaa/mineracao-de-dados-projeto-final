@@ -1,0 +1,830 @@
+\documentclass[aspectratio=43]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+\usepackage{booktabs}
+\usepackage{amsmath}
+
+\setbeamertemplate{itemize item}{$\bullet$}
+\setbeamertemplate{itemize subitem}{$\circ$}
+
+% Definição de coluna alinhada à esquerda sem hifenização feia (evita quebra de palavras no meio)
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Nova cor: Verde Escuro
+\definecolor{uelgreen}{RGB}{15, 80, 35}
+
+\setbeamercolor{boxcinza}{bg=gray!10}
+\setbeamercolor{boxtitulo}{bg=gray!25}
+\setbeamercolor{boxcorpo}{bg=gray!10}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.30cm,dp=0.15cm]{headline}
+    \color{white}
+    \hspace{0.3cm}Machine Learning - Document Clustering
+    \hfill \insertframenumber\ de \inserttotalframenumber \hspace{0.3cm}
+  \end{beamercolorbox}
+}
+\setbeamercolor{headline}{bg=uelgreen}
+\setbeamercolor{frametitle}{fg=uelgreen}
+
+\title{Machine Learning}
+\subtitle{Document Clustering}
+\author{Alunos: Eduardo Pedro, Lucas Antônio, Luiz Girotto, Marcos Vinicius}
+\date{29 de junho de 2026}
+
+\setbeamercolor{frametitle}{bg=gray!25, fg=uelgreen}
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[
+    wd=\paperwidth,
+    ht=0.7cm,
+    dp=0.3cm,
+    leftskip=0.30cm
+  ]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+  \end{beamercolorbox}
+}
+
+\begin{document}
+
+% Slide 1 (Capa)
+\begin{frame}[plain]
+\begin{center}
+
+\vspace{0.5cm}
+
+\colorbox{gray!25}{
+\begin{minipage}{0.90\textwidth}
+\centering
+\vspace{0.3cm}
+{\Huge\color{uelgreen} Machine Learning}
+
+\vspace{0.2cm}
+
+{\Large\color{uelgreen} Document Clustering}
+\vspace{0.2cm}
+\end{minipage}
+}
+
+\vspace{0.6cm}
+
+{\Small \textbf{Alunos:} Eduardo Pedro, Lucas Antônio, Luiz Girotto, Marcos Vinicius}
+
+\vspace{0.5cm}
+
+\includegraphics[width=0.4\textwidth]{Logo UEL.png}
+
+\vfill
+
+{\large 29 de Junho de 2026}
+
+\end{center}
+\end{frame}
+
+% Slide 2
+\begin{frame}[t]{O Problema: Excesso de Documentos Digitais}
+
+\vspace{0.05cm}
+
+\begin{itemize}
+
+\item O Problema
+\begin{itemize}
+    \item Documentos estão espalhados na Web e em sistemas privados.
+    \item Organização manual se torna difícil.
+    \item Informação relevante pode ficar "perdida" na coleção.
+\end{itemize}
+
+    \vspace{0.3cm}
+    
+\item O Papel do Clustering
+\begin{itemize}
+    \item Agrupa documentos semelhantes automaticamente.
+    \item Facilita a análise da coleção.
+    \item Ajuda na descoberta de padrões e temas.
+\end{itemize}
+
+\end{itemize}
+
+\begin{center}
+\begin{beamercolorbox}[
+    wd=0.80\paperwidth,
+    sep=0pt
+]{boxcinza}
+
+    \begin{beamercolorbox}[
+        wd=0.80\paperwidth,
+        ht=0.65cm,
+        dp=0.15cm,
+        leftskip=0.25cm
+    ]{boxtitulo}
+        {\Large\color{uelgreen} Ideia Central}
+    \end{beamercolorbox}
+
+    \begin{beamercolorbox}[
+        wd=0.80\paperwidth,
+        sep=0.45cm
+    ]{boxcorpo}
+        \small
+        O clustering organiza documentos em grupos, buscando alta semelhança dentro de cada grupo e maior diferença entre grupos distintos.
+    \end{beamercolorbox}
+
+\end{beamercolorbox}
+\end{center}
+\end{frame}
+
+% Slide 3 (Fusão de Limitações e Tabela de Dificuldades)
+\begin{frame}[t]{Limitações e Dificuldades Práticas}
+
+\vspace{0.1cm}
+
+\begin{itemize}
+    \item Documentos possuem características desafiadoras para o clustering tradicional:
+    \begin{itemize}
+        \item \textbf{Alta dimensionalidade} e esparsidade espacial;
+        \item \textbf{Vocabulário variado} (sinônimos, ruído, termos irrelevantes);
+        \item \textbf{Tamanhos heterogêneos} (extremos de comprimento).
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.15cm}
+
+\begin{center}
+\scriptsize
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{P{2.6cm} P{2.7cm} P{3.5cm}}
+\hline
+\textbf{Documento} & \textbf{Característica} & \textbf{Dificuldade no Clustering} \\
+\hline
+Tweet/Resumo curto & Poucas palavras & Similaridade imprecisa (falta de sinal) \\
+Artigo/Relatório longo & Vários temas & Sobreposição (pode cair em mais de um grupo) \\
+Texto com muitos termos & Muitas dimensões & Maior complexidade e custo computacional \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+% Slide 4 (Fusão de VSM e Modelos Alternativos)
+\begin{frame}[t]{Representação de Documentos: VSM e Alternativas}
+
+\vspace{0.1cm}
+
+\textbf{Vector Space Model (VSM)}
+\begin{itemize}
+    \scriptsize
+    \item Transforma textos em vetores.
+    \item Representações comuns: \textbf{Bag-of-Words} e \textbf{TF-IDF}.
+    \item Base para o cálculo de similaridade.
+\end{itemize}
+
+\vspace{0.05cm}
+
+\begin{center}
+\tiny
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lccc}
+\hline
+\textbf{Documento} & \textbf{termo 1} & \textbf{termo 2} & \textbf{termo 3} \\
+\hline
+Doc 1 & 2 & 0 & 1 \\
+Doc 2 & 0 & 3 & 1 \\
+Doc 3 & 1 & 1 & 0 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Temos o LSA como Modelo Alternativo ao VSM}
+\begin{itemize}
+    \item \textbf{LSA (Latent Semantic Analysis)}: Captura o espaço semântico latente por SVD.
+\end{itemize}
+
+\vspace{0.6cm}
+
+\begin{beamercolorbox}[wd=\textwidth, sep=0.15cm]{boxcinza}
+    \tiny \color{uelgreen} \textbf{Escolha estratégica:} Cada alternativa resolve uma limitação do VSM clássico, sacrificando simplicidade ou poder computacional.
+\end{beamercolorbox}
+
+\end{frame}
+
+% Slide 5
+\begin{frame}[t]{Alta Dimensionalidade e Esparsidade}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+
+    \item A matriz documento-termo cresce com o vocabulário da coleção:
+    \begin{itemize}
+        \item Cada termo único do corpus vira uma dimensão.
+        \item Coleções reais facilmente atingem \textbf{milhares ou milhões} de termos.
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item Cada documento usa apenas uma pequena fração desse vocabulário:
+    \begin{itemize}
+        \item A grande maioria das entradas da matriz é \textbf{zero} (esparsidade).
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \item Termos podem ser \textbf{correlacionados} (sinônimos, flexões, variações), redundância que infla ainda mais o espaço.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{lccccc}
+\hline
+\textbf{Doc} & termo$_1$ & termo$_2$ & termo$_3$ & $\cdots$ & termo$_M$ \\
+\hline
+Doc 1 & 2 & 0 & 0 & $\cdots$ & 0 \\
+Doc 2 & 0 & 0 & 1 & $\cdots$ & 0 \\
+Doc 3 & 0 & 1 & 0 & $\cdots$ & 0 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{beamercolorbox}[wd=0.80\paperwidth, sep=0pt]{boxcinza}
+  \begin{beamercolorbox}[wd=0.80\paperwidth, ht=0.5cm, dp=0.1cm, leftskip=0.25cm]{boxtitulo}
+    {\color{uelgreen}\textbf{Impacto}}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[wd=0.80\paperwidth, sep=0.25cm]{boxcorpo}
+    \scriptsize
+    Algoritmos clássicos (K-means, DBSCAN) assumem espaços densos e de baixa dimensão. Aqui, a "maldição da dimensionalidade" reduz seu poder discriminativo.
+  \end{beamercolorbox}
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+% Slide 6 (Fusão de Detalhamento e Tabela de Extremos: Curtos vs. Longos)
+\begin{frame}[t]{Os Extremos: Documentos Curtos vs. Longos}
+
+\vspace{0.1cm}
+
+\begin{itemize}
+    \item Os dois extremos quebram premissas diferentes do VSM clássico: curtos por \textbf{falta} de sinal; longos por \textbf{excesso} de tópicos (sobreposição).
+\end{itemize}
+
+\vspace{0.15cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.2}
+\begin{center}
+\begin{tabular}{P{2.3cm} P{4.1cm} P{4.1cm}}
+\hline
+\textbf{Característica} & \textbf{Documentos curtos (tweets, snippets)} & \textbf{Documentos longos (artigos)} \\
+\hline
+\textbf{Problema central} & Baixa informação $\rightarrow$ vetores esparsos e sem termos em comum & Abordam múltiplos tópicos $\rightarrow$ vetor único oculta a mistura \\
+Ruído & Alto (gírias, abreviações, erros) & Baixo \\
+Foco / Domínio & Alto foco local (comunidades) & Vocabulário técnico específico \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.1cm}
+
+\begin{center}
+\begin{beamercolorbox}[wd=0.85\paperwidth, sep=0.15cm]{boxcinza}
+    \scriptsize \color{uelgreen} \textbf{O dilema:} Algoritmos clássicos assumem pertinência a um único cluster, mas textos reais nem sempre respeitam essa premissa de desarticulação.
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+% Slide 7
+\begin{frame}[t]{Por que a Distância Euclidiana Falha?}
+
+\vspace{0.1cm}
+
+\begin{itemize}
+    \vspace{0.1cm}
+
+    \item Em espaços de alta dimensão e esparsos:
+    \begin{itemize}
+        \item Todos os pontos tendem a ficar "igualmente distantes" entre si.
+        \item A distância perde poder discriminativo (concentração de distâncias).
+        \item Documentos de tamanhos diferentes têm normas $\|d\|$ diferentes, isso \textbf{distorce} a distância mesmo entre textos sobre o mesmo assunto.
+    \end{itemize}
+
+    \vspace{0.1cm}
+
+    \item O que realmente importa para texto é a \textbf{direção} do vetor (proporção entre termos), não sua magnitude (tamanho do documento).
+
+\end{itemize}
+
+\vfill
+
+\begin{center}
+\begin{beamercolorbox}[wd=0.80\paperwidth, sep=0pt]{boxcinza}
+  \begin{beamercolorbox}[wd=0.80\paperwidth, ht=0.55cm, dp=0.12cm, leftskip=0.25cm]{boxtitulo}
+    {\color{uelgreen}\textbf{O gancho}}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[wd=0.80\paperwidth, sep=0.3cm]{boxcorpo}
+    \small
+    Isso motiva o uso da \textbf{similaridade do cosseno} sobre vetores normalizados, no lugar da distância Euclidiana, base do algoritmo que apresentaremos.
+  \end{beamercolorbox}
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+% Slide 8
+\begin{frame}[t]{Limitações dos Algoritmos Clássicos no Domínio Textual}
+
+\vspace{0.2cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.4} 
+
+\begin{center}
+\begin{tabular}{
+    P{1.8cm} 
+    P{4.5cm}
+    P{4.2cm}
+}
+\hline
+\textbf{Algoritmo} & \textbf{Premissa do método} & \textbf{Problema com texto} \\
+\hline
+K-Means & Distância Euclidiana e centróides no espaço original; assume clusters \textbf{disjuntos} & Esparsidade/alta dimensão distorcem distâncias; documentos multi-tópico não cabem em 1 grupo \\
+DBSCAN & Requer raio de vizinhança ($\varepsilon$) e limiar de densidade fixos & Densidade não é uniforme em espaços esparsos de alta dimensão \\
+Hierárquico & Calcula similaridade par-a-par entre todos os objetos & Custo $O(N^2)$ -- inviável para coleções grandes \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+
+\normalsize
+\begin{itemize}
+    \item Em comum: nenhum foi desenhado para vetores \textbf{esparsos}, \textbf{normalizados} e de \textbf{alta dimensão}.
+    \item Adaptações específicas (ex.: Spherical k-Means) tornam-se necessárias.
+\end{itemize}
+
+\end{frame}
+
+% Slide 9 (Fusão de Algoritmo Utilizado e Por que Fuzzy)
+\begin{frame}[t]{O Algoritmo: Fuzzy Spherical K-Means (FSK-Means)}
+
+\vspace{0.25cm}
+\textcolor{uelgreen}{\large Uma variação do K-Means desenvolvida para textos}
+
+\vspace{0.4cm}
+
+\begin{itemize}
+    \item \textbf{Por que a abordagem Spherical?}
+    \begin{itemize}
+        \item Foca na \textbf{direção} dos vetores e na similaridade angular (cosseno), o que mitiga os problemas de dimensionalidade e variação de comprimento dos textos.
+    \end{itemize}
+    
+    \vspace{0.2cm}
+    
+    \item \textbf{Por que a abordagem Fuzzy (Lógica Difusa)?}
+    \begin{itemize}
+        \item Documentos frequentemente tratam de múltiplos tópicos ao mesmo tempo.
+        \item Cada documento recebe um \textbf{grau de pertencimento parcial} (entre 0 e 1) para cada cluster, oferecendo mais flexibilidade que o K-Means rígido.
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+% Slide 10
+\begin{frame}[t]{Entenda o Fuzzy}
+
+\textcolor{gray}{\large Interpretação Simples - O Parâmetro \textbf{"M"}}
+
+\vspace{0.3cm}
+
+Pense no M como um controle de "rigidez":
+
+\begin{center}
+\footnotesize
+\begin{tabular}{|c|P{6.5cm}|}
+\hline
+\textbf{Valor de $M$} & \textbf{Comportamento} \\
+\hline
+$M \approx 1$ & Agrupamento mais rígido, próximo do K-Means tradicional. \\
+\hline
+$M = 2$ & Valor mais usado na prática, com bom equilíbrio entre rigidez e flexibilidade. \\
+\hline
+$M$ muito alto & Agrupamento mais difuso, com pertencimentos mais distribuídos entre os clusters. \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{beamercolorbox}[
+    wd=0.80\paperwidth,
+    sep=0pt
+]{boxcinza}
+
+    \begin{beamercolorbox}[
+        wd=0.80\paperwidth,
+        ht=0.55cm,
+        dp=0.12cm,
+        sep=0pt
+    ]{boxtitulo}
+        \hspace*{0.25cm}%
+        {\color{uelgreen}\textbf{De maneira Geral}}
+    \end{beamercolorbox}
+
+    \begin{beamercolorbox}[
+        wd=0.80\paperwidth,
+        sep=0pt
+    ]{boxcorpo}
+        \vspace{0.20cm}
+
+        \hspace*{0.25cm}%
+        \begin{minipage}{0.73\paperwidth}
+            \small
+            O parâmetro M controla o nível de “fuzziness” do algoritmo. Quanto menor o M, mais rígido é o agrupamento; quanto maior o M, mais distribuído fica o pertencimento dos documentos entre os clusters.
+        \end{minipage}
+
+        \vspace{0.20cm}
+    \end{beamercolorbox}
+
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+% Slide 11
+\begin{frame}[t]{Por que a Abordagem Esférica?}
+
+\vspace{0.2cm}
+
+\textcolor{gray}{\large A importância da Direção dos Vetores}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Documentos são representados como vetores num espaço textual.
+
+    \item A similaridade entre documentos é medida pela direção dos vetores.
+
+    \item O foco não está no tamanho do documento, mas no seu conteúdo.
+
+    \item A similaridade por cosseno ajuda a comparar documentos textuais.
+
+    \item Essa abordagem funciona bem em bases com muitos termos e alta dimensionalidade.
+    
+\end{itemize}
+
+\end{frame}
+
+% Slide 12
+\begin{frame}[t]{A Hiperesfera Unitária}
+
+\textcolor{gray}{\large Normalização e similaridade angular}
+
+\vspace{0.2cm}
+
+\begin{columns}
+
+\column{0.48\textwidth}
+\begin{center}
+\begin{tikzpicture}[scale=1.55, >=Latex]
+
+    \draw[thick, gray] (0,0) circle (1.4);
+
+    \draw[->, thick, uelgreen] (0,0) -- (50:1.4);
+    \draw[->, thick, uelgreen] (0,0) -- (63:1.4);
+    \draw[->, thick, red!70!black] (0,0) -- (145:1.4);
+
+    \node[uelgreen] at (50:1.65) {$d_1$};
+    \node[uelgreen] at (63:1.65) {$d_2$};
+    \node[red!70!black] at (145:1.65) {$d_3$};
+
+    \draw[->, gray] (0.45,0) arc (0:50:0.45);
+    \node[gray] at (25:0.65) {$\theta$};
+
+    \node[align=center, gray] at (0,-1.85) {\scriptsize Vetores próximos: temas semelhantes};
+
+\end{tikzpicture}
+\end{center}
+
+\column{0.52\textwidth}
+
+\begin{itemize}
+    \item Na abordagem esférica, os vetores são normalizados.
+    \item Todos passam a ter norma igual a 1.
+    \item A comparação passa a depender da direção dos vetores.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\[
+\hat{x} = \frac{x}{\|x\|}
+\]
+
+\[
+\cos(\theta)=\frac{x \cdot y}{\|x\|\|y\|}
+\]
+
+\end{columns}
+
+\end{frame}
+
+% Slide 13
+\begin{frame}[t]{Pipeline de Pré-processamento}
+
+\textcolor{gray}{\large Antes do FSK-Means}
+
+\vspace{0.01cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    etapa/.style={rectangle, draw=uelgreen, thick, rounded corners, minimum width=2.1cm, minimum height=0.65cm, align=center},
+    seta/.style={->, thick, uelgreen}
+]
+\node[etapa] (tfidf) {TF-IDF};
+\node[etapa, right=of tfidf] (svd) {SVD};
+\node[etapa, right=of svd] (l2) {Norm. L2};
+\node[etapa, right=of l2] (fsk) {FSK-Means};
+
+\draw[seta] (tfidf) -- (svd);
+\draw[seta] (svd) -- (l2);
+\draw[seta] (l2) -- (fsk);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\textcolor{gray}{\large Detalhamento:}
+
+\vspace{0.3cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\begin{tabular}{P{2.0cm} P{3.6cm} P{3.6cm}}
+\toprule
+\textbf{Etapa} & \textbf{Função} & \textbf{Importância} \\
+\midrule
+TF-IDF & Converte texto em pesos & Destaca termos relevantes \\
+SVD & Reduz dimensões & Remove ruído e redundância \\
+Norm. L2 & Normaliza vetores & Permite comparação angular \\
+FSK-Means & Agrupa com pertinência & Lida com sobreposição temática \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+% Slide 14
+\begin{frame}[t]{Estrutura do FSK-Means}
+
+\textcolor{gray}{\large Etapas lógicas do algoritmo}
+
+\vspace{0.15cm}
+
+\begin{columns}[T]
+
+\column{0.62\textwidth}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.50cm,
+    bloco/.style={rectangle, draw=uelgreen, thick, rounded corners, minimum width=5.1cm, minimum height=0.38cm, align=center, font=\scriptsize},
+    decisao/.style={diamond, draw=uelgreen, thick, aspect=2.3, align=center, inner sep=0.5pt, font=\scriptsize},
+    seta/.style={->, thick, uelgreen}
+]
+
+\node[bloco] (entrada) {Entrada: TF-IDF reduzida e normalizada};
+\node[bloco, below=of entrada] (init) {Inicializar matriz de pertinência $U$};
+\node[bloco, below=of init] (centroide) {Calcular centroides};
+\node[bloco, below=of centroide] (pert) {Atualizar pertinências};
+\node[decisao, below=of pert, yshift=-0.05cm] (stop) {$\Delta U < \varepsilon$?};
+\node[bloco, below=of stop, yshift=-0.05cm] (saida) {Saída: clusters, pertinências e centroides};
+
+\draw[seta] (entrada) -- (init);
+\draw[seta] (init) -- (centroide);
+\draw[seta] (centroide) -- (pert);
+\draw[seta] (pert) -- (stop);
+\draw[seta] (stop) -- node[right, font=\scriptsize]{sim} (saida);
+
+\draw[seta] (stop.west) -- ++(-2.1,0) node[left, font=\scriptsize]{não} |- (centroide.west);
+
+\end{tikzpicture}
+\end{center}
+
+\column{0.34\textwidth}
+
+\vspace{0.45cm}
+
+\begin{beamercolorbox}[wd=\textwidth, sep=0pt]{boxcinza}
+  \begin{beamercolorbox}[wd=\textwidth, ht=0.45cm, dp=0.08cm, leftskip=0.18cm]{boxtitulo}
+    {\color{uelgreen}\scriptsize\textbf{Ideia do loop}}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[wd=\textwidth, sep=0.18cm]{boxcorpo}
+    \scriptsize
+    A cada iteração, o algoritmo ajusta os centroides e os graus de pertencimento.
+
+    \vspace{0.15cm}
+
+    O processo continua até que a mudança em $U$ seja pequena.
+  \end{beamercolorbox}
+\end{beamercolorbox}
+
+\vspace{0.35cm}
+
+\end{columns}
+
+\end{frame}
+
+% Slide 15
+\begin{frame}[t]{Cálculos do FSK-Means}
+
+\vspace{0.15cm}
+\small
+\begin{itemize}
+    \item \textbf{Entrada:} Dados normalizados $D$, número de clusters $K$, parâmetro $M$.
+    
+    \item \textbf{Inicialização:} Definir matriz de pertinência $U_{N \times K}$ aleatoriamente.
+    
+    \item \textbf{Repetir até a convergência ($\Delta U < \varepsilon$):}
+    \begin{enumerate}
+        \item \textbf{Calcular os centroides $v_j$ para cada cluster $j$:} \\
+        \quad $v_j = \sum_{i=1}^{N} (u_{ij})^M \cdot d_i$
+        
+        \vspace{0.05cm}
+        \item \textbf{Normalizar os centroides na hiperesfera:} \\
+        \quad $v_j = \frac{v_j}{\|v_j\|}$
+        
+        \vspace{0.05cm}
+        \item \textbf{Atualizar a matriz de pertinência $U$:} \\
+        \quad $\displaystyle u_{ij} = \frac{(\cos(d_i, v_j))^{\frac{1}{M-1}}}{\sum_{k=1}^{K} (\cos(d_i, v_k))^{\frac{1}{M-1}}}$
+    \end{enumerate}
+    
+    \vspace{0.1cm}
+    \item \textbf{Saída:} Matriz de pertinências final $U$ e centroides normalizados $V$.
+\end{itemize}
+
+\end{frame}
+
+% Slide 16
+\begin{frame}[t]{Nomeação dos Clusters}
+
+\textcolor{gray}{\large Como interpretar os grupos encontrados}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item Usamos os \textbf{top-n termos} mais fortes do centróide.
+    \item Esses termos ajudam a sugerir um nome para o grupo.
+    \item No FSK-Means, a interpretação considera pertencimento parcial.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.2}
+\begin{center}
+\begin{tabular}{P{1.3cm} P{4.8cm} P{2.6cm}}
+\toprule
+\textbf{Cluster} & \textbf{Termos principais} & \textbf{Nome} \\
+\midrule
+C1 & futebol, campeonato, time, jogo & Esportes \\
+C2 & governo, eleição, partido, política & Política \\
+C3 & mercado, inflação, economia, bolsa & Economia \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{beamercolorbox}[wd=0.82\paperwidth, sep=0pt]{boxcinza}
+  \begin{beamercolorbox}[wd=0.82\paperwidth, ht=0.42cm, dp=0.08cm, leftskip=0.2cm]{boxtitulo}
+    {\color{uelgreen}\scriptsize\textbf{Vantagem fuzzy}}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[wd=0.82\paperwidth, sep=0.18cm]{boxcorpo}
+    \scriptsize
+    Um documento pode contribuir para mais de um cluster, tornando a leitura dos grupos menos rígida que no K-Means tradicional.
+  \end{beamercolorbox}
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+% Slide 17
+\begin{frame}[t]{Métricas de Avaliação}
+
+\textcolor{gray}{\large Como medir a qualidade dos clusters}
+
+\vspace{0.25cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.22}
+\begin{center}
+\begin{tabular}{P{2.5cm} P{4.1cm} P{2.0cm}}
+\toprule
+\textbf{Métrica} & \textbf{O que avalia} & \textbf{Melhor} \\
+\midrule
+Silhouette Fuzzy & Coesão interna e separação considerando pertinências & Maior \\
+Davies-Bouldin & Similaridade média entre clusters & Menor \\
+Calinski-Harabasz & Separação entre grupos e compactação interna & Maior \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.35cm}
+
+\begin{itemize}
+    \item Clustering geralmente não possui rótulo verdadeiro.
+    \item Por isso, usamos métricas internas.
+    \item O objetivo é formar grupos compactos e bem separados.
+\end{itemize}
+
+\end{frame}
+
+% Slide 18
+\begin{frame}[t]{Conclusão}
+
+\textcolor{gray}{\large Por que o FSK-Means foi escolhido?}
+
+\vspace{0.2cm}
+
+\scriptsize
+\renewcommand{\arraystretch}{1.18}
+\begin{center}
+\begin{tabular}{P{2.1cm} P{2.0cm} P{2.2cm} P{2.5cm}}
+\toprule
+\textbf{Critério} & \textbf{K-Means} & \textbf{FSK-Means} & \textbf{Outros} \\
+\midrule
+Pertencimento & Rígido & Parcial & Varia \\
+Texto & Médio & Alto & Depende \\
+Alta dimensão & Sensível & Melhor com L2 & Pode custar mais \\
+Interpretação & Simples & Flexível & Pode ser complexa \\
+Escalabilidade & Boa & Boa & Menor em bases grandes \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{center}
+\begin{beamercolorbox}[wd=0.82\paperwidth, sep=0pt]{boxcinza}
+  \begin{beamercolorbox}[wd=0.82\paperwidth, ht=0.42cm, dp=0.08cm, leftskip=0.2cm]{boxtitulo}
+    {\color{uelgreen}\scriptsize\textbf{Mensagem final}}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[wd=0.82\paperwidth, sep=0.2cm]{boxcorpo}
+    \scriptsize
+    O FSK-Means combina vetores normalizados, similaridade angular e pertencimento parcial, sendo uma escolha adequada para documentos com alta dimensionalidade e sobreposição temática.
+  \end{beamercolorbox}
+\end{beamercolorbox}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[t]{Referências}
+
+\vspace{0.5cm}
+
+\scriptsize
+\begin{beamercolorbox}[wd=0.90\paperwidth, sep=0.25cm]{boxcorpo}
+
+WIKIPÉDIA. \textbf{Agrupamento difuso (fuzzy)}. Disponível em: 
+\url{https://pt.wikipedia.org/wiki/Agrupamento_difuso_(fuzzy)}. 
+
+\vspace{0.18cm}
+
+WOLFRAM RESEARCH. \textbf{Fuzzy Logic Package: Manual}. Disponível em: 
+\url{https://reference.wolfram.com/legacy/applications/fuzzylogic/Manual/12.html}. 
+
+\vspace{0.18cm}
+
+SCIKIT-LEARN. \textbf{sklearn.cluster.kmeans\_plusplus}. Disponível em: 
+\url{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.kmeans_plusplus.html}. 
+
+\vspace{0.18cm}
+
+SCIKIT-LEARN. \textbf{sklearn.preprocessing.normalize}. Disponível em: 
+\url{https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.normalize.html}. 
+
+\vspace{0.18cm}
+
+AGGARWAL. \textbf{AGGARWAL, C. C.; REDDY, C. K. (Ed.). Data clustering: algorithms and applications. Boca Raton: CRC Press, 2013.}
+
+\end{beamercolorbox}
+
+\end{frame}
+
+\end{document}
